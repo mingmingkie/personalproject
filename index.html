@@ -7,80 +7,50 @@
 <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --pink: #f4a7b9;
-    --pink-dark: #e87fa0;
-    --pink-deep: #c2185b;
-    --green: #a8d5b5;
-    --green-dark: #7fbf92;
-    --blue-light: #a8c8e8;
-    --cream: #fffdf5;
-    --warm-border: #e8e0d0;
-    --text-main: #3a4a5a;
-    --text-muted: #8a9bb0;
-    --text-warm: #5c4a3a;
-    --bg-glass: rgba(255,255,255,0.82);
+    --pink: #f4a7b9; --pink-dark: #e87fa0; --pink-deep: #c2185b;
+    --green: #a8d5b5; --green-dark: #7fbf92; --blue-light: #a8c8e8;
+    --cream: #fffdf5; --warm-border: #e8e0d0;
+    --text-main: #3a4a5a; --text-muted: #8a9bb0; --text-warm: #5c4a3a;
+    --bg-glass: rgba(255,255,255,0.85);
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { min-height: 100vh; font-family: 'Noto Sans KR', sans-serif; color: var(--text-main); background: #f5e6ef; overflow-x: hidden; }
-
   body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 20% 10%, #fce4ec 0%, transparent 60%),
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 80% 60% at 20% 10%, #fce4ec 0%, transparent 60%),
       radial-gradient(ellipse 60% 80% at 80% 20%, #e3f2fd 0%, transparent 60%),
       radial-gradient(ellipse 70% 50% at 50% 80%, #f8bbd0 0%, transparent 60%),
       linear-gradient(160deg, #fce4ec 0%, #e8f4fd 45%, #f3e5f5 100%);
     animation: skyShift 12s ease-in-out infinite alternate;
   }
-  @keyframes skyShift {
-    0%   { filter: hue-rotate(0deg) brightness(1); }
-    100% { filter: hue-rotate(15deg) brightness(1.05); }
-  }
+  @keyframes skyShift { 0% { filter: hue-rotate(0deg) brightness(1); } 100% { filter: hue-rotate(15deg) brightness(1.05); } }
   body::after {
-    content: '';
-    position: fixed; inset: 0; z-index: 0;
-    background-image:
-      radial-gradient(circle 80px at 10% 20%, rgba(255,255,255,0.5) 0%, transparent 70%),
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background-image: radial-gradient(circle 80px at 10% 20%, rgba(255,255,255,0.5) 0%, transparent 70%),
       radial-gradient(circle 120px at 85% 15%, rgba(255,255,255,0.45) 0%, transparent 70%),
       radial-gradient(circle 60px at 60% 60%, rgba(255,255,255,0.3) 0%, transparent 70%),
       radial-gradient(circle 90px at 30% 75%, rgba(255,255,255,0.35) 0%, transparent 70%);
-    animation: cloudDrift 20s ease-in-out infinite alternate;
-    pointer-events: none;
+    animation: cloudDrift 20s ease-in-out infinite alternate; pointer-events: none;
   }
-  @keyframes cloudDrift {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(30px); }
-  }
+  @keyframes cloudDrift { 0% { transform: translateX(0); } 100% { transform: translateX(30px); } }
 
-  .app {
-    position: relative; z-index: 1;
-    min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center;
-    padding: 3rem 1rem 4rem;
-  }
+  .app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 3rem 1rem 4rem; }
 
   .logo-area { text-align: center; margin-bottom: 3rem; animation: fadeDown 0.7s ease both; }
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-18px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: translateY(0); } }
   .logo-title { font-family: 'Nanum Myeongjo', serif; font-size: clamp(2.2rem, 6vw, 3rem); font-weight: 800; color: #4a5a6a; letter-spacing: 0.12em; line-height: 1; }
   .logo-hearts { display: flex; justify-content: center; gap: 6px; margin: 0.5rem 0 0.4rem; }
   .logo-hearts span { width: 6px; height: 6px; border-radius: 50%; background: var(--pink-dark); animation: pulse 1.8s ease-in-out infinite; }
   .logo-hearts span:nth-child(2) { animation-delay: 0.3s; background: var(--green-dark); }
   .logo-hearts span:nth-child(3) { animation-delay: 0.6s; }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.5); opacity: 1; }
-  }
+  @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.5); opacity: 1; } }
   .logo-sub { font-size: 0.82rem; color: var(--text-muted); letter-spacing: 0.2em; font-weight: 300; }
 
   .envelope-row { display: flex; gap: 2.5rem; margin-bottom: 3rem; animation: fadeDown 0.7s 0.15s ease both; }
   .envelope-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; cursor: pointer; }
   .envelope-btn {
-    position: relative; width: 100px; height: 72px; border-radius: 8px;
-    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    position: relative; width: 100px; height: 72px; border-radius: 8px; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
     transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   }
@@ -88,157 +58,94 @@
   .envelope-btn:active { transform: scale(0.97); }
   .envelope-btn.green { background: var(--green); border: 2px solid var(--green-dark); }
   .envelope-btn.pink  { background: var(--pink);  border: 2px solid var(--pink-dark); }
-  .envelope-btn::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 36px;
-    clip-path: polygon(0 0, 100% 0, 50% 58%);
-  }
+  .envelope-btn.blue  { background: var(--blue-light); border: 2px solid #7aaed4; }
+  .envelope-btn::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 36px; clip-path: polygon(0 0, 100% 0, 50% 58%); }
   .envelope-btn.green::before { background: var(--green-dark); opacity: 0.6; }
   .envelope-btn.pink::before  { background: var(--pink-dark);  opacity: 0.6; }
+  .envelope-btn.blue::before  { background: #7aaed4; opacity: 0.6; }
   .envelope-label { font-size: 0.72rem; font-weight: 500; color: #fff; letter-spacing: 0.06em; position: relative; z-index: 1; margin-top: 18px; }
-  .envelope-count {
-    position: absolute; bottom: -9px; right: -9px;
-    width: 24px; height: 24px; border-radius: 50%;
-    background: #fff; border: 2px solid rgba(0,0,0,0.1);
-    font-size: 0.72rem; font-weight: 700; color: #5a6a7a;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
+  .envelope-count { position: absolute; bottom: -9px; right: -9px; width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 2px solid rgba(0,0,0,0.1); font-size: 0.72rem; font-weight: 700; color: #5a6a7a; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
   .envelope-tag { font-size: 0.72rem; color: var(--text-muted); text-align: center; }
 
-  .card {
-    background: var(--bg-glass); border-radius: 20px;
-    border: 1px solid rgba(220,210,230,0.5); padding: 2rem;
-    width: 100%; max-width: 540px;
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 8px 40px rgba(180,150,180,0.1);
-    animation: fadeUp 0.4s ease both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  .card { background: var(--bg-glass); border-radius: 20px; border: 1px solid rgba(220,210,230,0.5); padding: 2rem; width: 100%; max-width: 560px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 8px 40px rgba(180,150,180,0.1); animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
   .section-label { font-size: 0.73rem; color: var(--text-muted); margin-bottom: 0.35rem; letter-spacing: 0.05em; }
-  .input-field {
-    width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid #e0e8f0; border-radius: 10px;
-    font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif; color: var(--text-main);
-    background: rgba(255,255,255,0.9); outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 1.1rem;
-  }
+  .input-field { width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid #e0e8f0; border-radius: 10px; font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif; color: var(--text-main); background: rgba(255,255,255,0.9); outline: none; transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 1.1rem; }
   .input-field:focus { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(244,167,185,0.15); }
   textarea.input-field { resize: vertical; min-height: 175px; line-height: 1.75; }
 
-  .btn-primary {
-    width: 100%; padding: 0.8rem; border-radius: 12px; border: none;
-    background: linear-gradient(135deg, var(--pink-dark) 0%, var(--blue-light) 100%);
-    color: #fff; font-size: 0.95rem; font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 500; cursor: pointer; letter-spacing: 0.04em;
-    transition: opacity 0.2s, transform 0.15s;
-    box-shadow: 0 4px 16px rgba(232,127,160,0.3);
-  }
+  .btn-primary { width: 100%; padding: 0.8rem; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--pink-dark) 0%, var(--blue-light) 100%); color: #fff; font-size: 0.95rem; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; cursor: pointer; letter-spacing: 0.04em; transition: opacity 0.2s, transform 0.15s; box-shadow: 0 4px 16px rgba(232,127,160,0.3); }
   .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
   .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-  .btn-secondary {
-    background: rgba(255,255,255,0.7); border: 1.5px solid #dde3ea; border-radius: 10px;
-    padding: 0.55rem 1.1rem; color: var(--text-muted); font-size: 0.82rem;
-    font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
-    transition: background 0.2s, border-color 0.2s; margin-top: 0.85rem; display: inline-block;
-  }
+  .btn-secondary { background: rgba(255,255,255,0.7); border: 1.5px solid #dde3ea; border-radius: 10px; padding: 0.55rem 1.1rem; color: var(--text-muted); font-size: 0.82rem; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: background 0.2s, border-color 0.2s; margin-top: 0.85rem; display: inline-block; }
   .btn-secondary:hover { background: #f0f4f8; border-color: #c8d0da; }
 
-  .btn-reveal {
-    background: #fff3e0; border: 1.5px solid #ffb74d; border-radius: 9px;
-    padding: 0.4rem 0.9rem; color: #bf360c; font-size: 0.78rem;
-    font-family: 'Noto Sans KR', sans-serif; font-weight: 500; cursor: pointer;
-    transition: background 0.2s; white-space: nowrap;
-  }
+  .btn-reveal { background: #fff3e0; border: 1.5px solid #ffb74d; border-radius: 9px; padding: 0.4rem 0.9rem; color: #bf360c; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
   .btn-reveal:hover { background: #ffe0b2; }
-  .btn-hide {
-    background: #fce4ec; border: 1.5px solid #f48fb1; border-radius: 9px;
-    padding: 0.4rem 0.9rem; color: #880e4f; font-size: 0.78rem;
-    font-family: 'Noto Sans KR', sans-serif; font-weight: 500; cursor: pointer;
-    transition: background 0.2s; white-space: nowrap;
-  }
+  .btn-hide { background: #fce4ec; border: 1.5px solid #f48fb1; border-radius: 9px; padding: 0.4rem 0.9rem; color: #880e4f; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
   .btn-hide:hover { background: #f8bbd0; }
-
-  .btn-danger {
-    background: none; border: 1.5px solid #ffcdd2; border-radius: 8px;
-    padding: 0.3rem 0.7rem; color: #c62828; font-size: 0.72rem;
-    font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
-    transition: background 0.2s; white-space: nowrap;
-  }
+  .btn-danger { background: none; border: 1.5px solid #ffcdd2; border-radius: 8px; padding: 0.3rem 0.7rem; color: #c62828; font-size: 0.72rem; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
   .btn-danger:hover { background: #ffebee; }
 
+  /* Tab navigation (view switcher) */
+  .view-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-radius: 12px; overflow: hidden; border: 1.5px solid #e0e8f0; }
+  .view-tab { flex: 1; padding: 0.65rem; border: none; background: rgba(255,255,255,0.6); font-size: 0.82rem; font-family: 'Noto Sans KR', sans-serif; color: var(--text-muted); cursor: pointer; transition: all 0.2s; border-right: 1px solid #e0e8f0; }
+  .view-tab:last-child { border-right: none; }
+  .view-tab.active { background: linear-gradient(135deg, var(--pink-dark), var(--blue-light)); color: #fff; font-weight: 500; }
+
   .tab-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
-  .tab {
-    flex: 1; padding: 0.6rem; border-radius: 10px; border: 1.5px solid #dde3ea;
-    background: rgba(255,255,255,0.6); font-size: 0.82rem;
-    font-family: 'Noto Sans KR', sans-serif; color: var(--text-muted); cursor: pointer; transition: all 0.2s;
-  }
-  .tab.active {
-    background: linear-gradient(135deg, var(--pink-dark), var(--blue-light));
-    color: #fff; border-color: transparent; font-weight: 500;
-    box-shadow: 0 3px 12px rgba(232,127,160,0.25);
-  }
+  .tab { flex: 1; padding: 0.6rem; border-radius: 10px; border: 1.5px solid #dde3ea; background: rgba(255,255,255,0.6); font-size: 0.82rem; font-family: 'Noto Sans KR', sans-serif; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: linear-gradient(135deg, var(--pink-dark), var(--blue-light)); color: #fff; border-color: transparent; font-weight: 500; box-shadow: 0 3px 12px rgba(232,127,160,0.25); }
 
-  .notice-box {
-    background: rgba(255,248,240,0.9); border: 1px solid #f0ddc0; border-radius: 10px;
-    padding: 0.8rem 1rem; font-size: 0.8rem; color: #a07040; line-height: 1.7; margin-bottom: 1.1rem;
-  }
+  .notice-box { background: rgba(255,248,240,0.9); border: 1px solid #f0ddc0; border-radius: 10px; padding: 0.8rem 1rem; font-size: 0.8rem; color: #a07040; line-height: 1.7; margin-bottom: 1.1rem; }
+  .warn-box { background: rgba(255,235,238,0.9); border: 1px solid #ffcdd2; border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.79rem; color: #b71c1c; line-height: 1.7; margin-bottom: 1.1rem; }
 
-  .letter-paper {
-    background: var(--cream); border: 1px solid var(--warm-border); border-radius: 12px;
-    padding: 1.5rem 1.75rem; margin-bottom: 1.1rem;
-    font-family: 'Nanum Myeongjo', serif; font-size: 0.93rem; color: var(--text-warm);
-    line-height: 1.95; white-space: pre-wrap; min-height: 130px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
-  }
+  .letter-paper { background: var(--cream); border: 1px solid var(--warm-border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1.1rem; font-family: 'Nanum Myeongjo', serif; font-size: 0.93rem; color: var(--text-warm); line-height: 1.95; white-space: pre-wrap; min-height: 130px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.8); }
   .letter-header { font-size: 0.78rem; color: #b0a090; margin-bottom: 0.7rem; font-family: 'Noto Sans KR', sans-serif; }
   .letter-footer { font-size: 0.78rem; color: #b0a090; margin-top: 0.7rem; text-align: right; font-family: 'Noto Sans KR', sans-serif; }
 
-  .csm-group {
-    background: rgba(255,253,245,0.9); border: 1px solid var(--warm-border); border-radius: 14px;
-    margin-bottom: 1rem; overflow: hidden; box-shadow: 0 2px 12px rgba(200,160,140,0.08);
-    transition: box-shadow 0.2s;
-  }
-  .csm-group:hover { box-shadow: 0 4px 20px rgba(200,160,140,0.14); }
-  .csm-group-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.9rem 1.1rem; background: rgba(255,248,240,0.8);
-    border-bottom: 1px solid #f0e8e0; gap: 0.5rem; flex-wrap: wrap;
-  }
-  .csm-group-title { font-size: 0.9rem; font-weight: 500; color: #5c4a5a; }
-  .csm-group-count { font-size: 0.73rem; color: #b0a090; margin-left: 0.4rem; }
-  .revealed-badge {
-    display: inline-block; font-size: 0.68rem; background: #e8f5e9;
-    border-radius: 20px; padding: 2px 8px; color: #2e7d32; margin-left: 0.4rem;
-  }
-  .letter-item { padding: 1.1rem 1.1rem 0.9rem; border-bottom: 1px solid rgba(240,232,224,0.8); }
+  /* CSM card grid */
+  .csm-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+  .csm-card { background: rgba(255,253,245,0.92); border: 1px solid var(--warm-border); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(200,160,140,0.08); transition: box-shadow 0.2s, transform 0.15s; cursor: pointer; }
+  .csm-card:hover { box-shadow: 0 6px 24px rgba(200,160,140,0.18); transform: translateY(-2px); }
+  .csm-card-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.1rem; }
+  .csm-card-left { display: flex; align-items: center; gap: 0.75rem; }
+  .csm-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--blue-light)); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+  .csm-card-title { font-size: 0.9rem; font-weight: 500; color: #5c4a5a; }
+  .csm-card-count { font-size: 0.72rem; color: #b0a090; margin-top: 2px; }
+  .csm-card-arrow { font-size: 1rem; color: #c0b0c0; transition: transform 0.2s; }
+  .csm-card.open .csm-card-arrow { transform: rotate(90deg); }
+  .csm-card-body { display: none; border-top: 1px solid #f0e8e0; }
+  .csm-card.open .csm-card-body { display: block; }
+  .csm-card-actions { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.1rem; background: rgba(255,248,240,0.6); border-bottom: 1px solid #f0e8e0; flex-wrap: wrap; gap: 0.5rem; }
+  .revealed-badge { display: inline-block; font-size: 0.68rem; background: #e8f5e9; border-radius: 20px; padding: 2px 8px; color: #2e7d32; }
+
+  .letter-item { padding: 1rem 1.1rem 0.85rem; border-bottom: 1px solid rgba(240,232,224,0.8); }
   .letter-item:last-child { border-bottom: none; }
-  .letter-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.55rem; }
-  .cp-badge {
-    display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem;
-    background: #eef4fa; border-radius: 20px; padding: 3px 10px; color: #5a7a9a;
-  }
-  .letter-body-text {
-    font-family: 'Nanum Myeongjo', serif; font-size: 0.88rem;
-    color: var(--text-warm); line-height: 1.85; white-space: pre-wrap;
-  }
+  .letter-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+  .cp-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; background: #eef4fa; border-radius: 20px; padding: 3px 10px; color: #5a7a9a; }
+  .letter-body-text { font-family: 'Nanum Myeongjo', serif; font-size: 0.88rem; color: var(--text-warm); line-height: 1.85; white-space: pre-wrap; }
+
+  /* Public view - read only letter cards */
+  .public-csm-card { background: rgba(255,253,245,0.92); border: 1px solid var(--warm-border); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(200,160,140,0.08); margin-bottom: 0.75rem; }
+  .public-csm-header { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.1rem; background: rgba(255,248,240,0.6); border-bottom: 1px solid #f0e8e0; cursor: pointer; }
+  .public-csm-header:hover { background: rgba(255,240,220,0.7); }
+  .public-letter-item { padding: 1rem 1.1rem 0.85rem; border-bottom: 1px solid rgba(240,232,224,0.8); }
+  .public-letter-item:last-child { border-bottom: none; }
+  .public-letter-body { font-family: 'Nanum Myeongjo', serif; font-size: 0.9rem; color: var(--text-warm); line-height: 1.9; white-space: pre-wrap; }
+  .public-card-body { display: none; }
+  .public-csm-card.open .public-card-body { display: block; }
+  .public-card-arrow { margin-left: auto; font-size: 1rem; color: #c0b0c0; transition: transform 0.2s; }
+  .public-csm-card.open .public-card-arrow { transform: rotate(90deg); }
 
   .pin-wrap { text-align: center; padding: 0.5rem 0; }
   .pin-wrap p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.7; }
-  .pin-input {
-    width: 140px; text-align: center; letter-spacing: 0.4em; font-size: 1.3rem;
-    padding: 0.55rem; border: 2px solid #dde3ea; border-radius: 10px;
-    font-family: 'Noto Sans KR', sans-serif; outline: none;
-    margin-bottom: 1rem; display: block; margin-inline: auto;
-    background: rgba(255,255,255,0.9); transition: border-color 0.2s;
-  }
+  .pin-input { width: 140px; text-align: center; letter-spacing: 0.4em; font-size: 1.3rem; padding: 0.55rem; border: 2px solid #dde3ea; border-radius: 10px; font-family: 'Noto Sans KR', sans-serif; outline: none; margin-bottom: 1rem; display: block; margin-inline: auto; background: rgba(255,255,255,0.9); transition: border-color 0.2s; }
   .pin-input:focus { border-color: var(--pink); }
   .error-msg { color: var(--pink-deep); font-size: 0.8rem; margin-bottom: 0.75rem; }
-
   .divider { border: none; border-top: 1px solid rgba(220,210,220,0.5); margin: 1rem 0; }
   .card-subtitle { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em; text-align: center; margin-bottom: 1.5rem; font-weight: 300; }
   .empty-state { text-align: center; color: #b0c0d0; font-size: 0.85rem; padding: 2.5rem 0; line-height: 2; }
@@ -247,39 +154,18 @@
   .bottom-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
   .bottom-row .btn-secondary { flex: 1; text-align: center; margin-top: 0; }
 
-  /* Loading spinner */
-  .spinner {
-    display: inline-block; width: 18px; height: 18px;
-    border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
-    border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px;
-  }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loading-overlay {
-    position: fixed; inset: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(252,228,236,0.6); backdrop-filter: blur(4px);
-  }
-  .loading-box {
-    background: rgba(255,255,255,0.9); border-radius: 16px; padding: 2rem 2.5rem;
-    text-align: center; font-size: 0.9rem; color: var(--text-muted);
-    box-shadow: 0 8px 32px rgba(180,150,180,0.15);
-  }
+  .loading-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: rgba(252,228,236,0.6); backdrop-filter: blur(4px); }
+  .loading-box { background: rgba(255,255,255,0.9); border-radius: 16px; padding: 2rem 2.5rem; text-align: center; font-size: 0.9rem; color: var(--text-muted); box-shadow: 0 8px 32px rgba(180,150,180,0.15); }
   .loading-box .spinner { border-color: rgba(232,127,160,0.3); border-top-color: var(--pink-dark); width: 28px; height: 28px; margin: 0 auto 1rem; display: block; }
 
-  @media (max-width: 480px) {
-    .card { padding: 1.5rem; }
-    .envelope-row { gap: 1.5rem; }
-  }
+  @media (max-width: 480px) { .card { padding: 1.5rem; } .envelope-row { gap: 1.5rem; } }
 </style>
 </head>
 <body>
-
 <div id="loading-overlay" class="loading-overlay">
-  <div class="loading-box">
-    <div class="spinner"></div>
-    불러오는 중...
-  </div>
+  <div class="loading-box"><div class="spinner"></div>불러오는 중...</div>
 </div>
 
 <div class="app">
@@ -297,9 +183,16 @@
       </button>
       <div class="envelope-tag">X 소개서 쓰기</div>
     </div>
-    <div class="envelope-wrapper" onclick="showView('pin')">
-      <button class="envelope-btn pink" aria-label="보관함 열기">
+    <div class="envelope-wrapper" onclick="showView('public')">
+      <button class="envelope-btn blue" aria-label="공개 보관함">
         <span class="envelope-label">보관함</span>
+        <div class="envelope-count" id="count-public">0</div>
+      </button>
+      <div class="envelope-tag">공개 보관함</div>
+    </div>
+    <div class="envelope-wrapper" onclick="showView('pin')">
+      <button class="envelope-btn pink" aria-label="진행자 보관함">
+        <span class="envelope-label">진행자</span>
         <div class="envelope-count" id="count-list">0</div>
       </button>
       <div class="envelope-tag">진행자 전용</div>
@@ -319,6 +212,7 @@
       <div class="section-label">To — CSM 이름 (게임 중 숨겨짐)</div>
       <input class="input-field" id="input-to" placeholder="예: 리아" />
       <div class="section-label">X 소개서 내용</div>
+      <div class="warn-box">⚠️ 소개서 내용에는 CSM의 이름을 절대 넣지 마세요! 이름이 들어가면 게임이 싱거워져요.</div>
       <textarea class="input-field" id="input-body" placeholder="이 사람은 힘들고 지칠 때 대화를 보면 기분이 좋아집니다&#10;항상 작은 일에도 웃어버리는 사람이라는 것..."></textarea>
       <button class="btn-primary" onclick="goPreview()">미리보기 확인 →</button>
       <div style="text-align:center;"><button class="btn-secondary" onclick="showView('home')">← 처음으로</button></div>
@@ -331,6 +225,18 @@
       <button class="btn-primary" id="btn-save" onclick="saveLetter()">💌 소개서 저장하기</button>
       <div style="text-align:center;"><button class="btn-secondary" onclick="setTab('form')">← 다시 수정하기</button></div>
     </div>
+  </div>
+
+  <!-- VIEW: Public (공개 보관함) -->
+  <div class="card" id="view-public" style="display:none;">
+    <div class="list-top-bar">
+      <div class="card-subtitle" style="margin:0;">📖 공개 보관함</div>
+      <button class="btn-secondary" style="margin-top:0;" onclick="refreshPublic()">↻ 새로고침</button>
+    </div>
+    <div class="notice-box">💌 CSM을 클릭하면 소개서를 볼 수 있어요. 누가 썼는지는 게임 후 진행자가 공개해요!</div>
+    <div id="public-container"></div>
+    <hr class="divider" />
+    <div style="text-align:center;"><button class="btn-secondary" onclick="showView('home')">← 처음으로</button></div>
   </div>
 
   <!-- VIEW: PIN -->
@@ -346,13 +252,13 @@
     <div style="text-align:center;"><button class="btn-secondary" onclick="showView('home')">← 처음으로</button></div>
   </div>
 
-  <!-- VIEW: List -->
+  <!-- VIEW: Admin List (진행자) -->
   <div class="card" id="view-list" style="display:none;">
     <div class="list-top-bar">
-      <div class="card-subtitle" style="margin:0;">소개서 보관함</div>
+      <div class="card-subtitle" style="margin:0;">🔑 진행자 보관함</div>
       <button class="btn-reveal" id="btn-all" onclick="toggleAll()">🔓 전체 공개</button>
     </div>
-    <div class="notice-box">📋 CSM별로 묶어서 표시돼요. <strong>정답 공개</strong> 버튼을 누르면 CSM 이름과 CP 이름이 공개됩니다.</div>
+    <div class="notice-box">📋 CSM별로 묶어서 표시돼요. <strong>정답 공개</strong>를 누르면 CSM·CP 이름이 공개됩니다.</div>
     <div id="letters-container"></div>
     <hr class="divider" />
     <div class="bottom-row">
@@ -366,14 +272,13 @@
 <script>
   const API = 'https://script.google.com/macros/s/AKfycbwstyWTEhFUObyJ0oa4r8YqgWgkMbC6-aXXcXkvjI2DN_VS54qS86674IurxN1HvpSjdw/exec';
   const PIN_KEY = 'hwanseung_pin_v2';
-
   let letters = [];
   let revealed = {};
   let allRevealed = false;
+  let openCards = {}; // track open/close state per CSM
 
   function getPin() { return localStorage.getItem(PIN_KEY) || '1234'; }
 
-  /* ── API helper (JSONP — avoids CORS completely) ── */
   function apiCall(params) {
     return new Promise((resolve, reject) => {
       const cbName = 'cb_' + Date.now();
@@ -393,43 +298,33 @@
     });
   }
 
-  /* ── Init ── */
   async function init() {
     showOverlay(true);
     try {
       await apiCall({ action: 'init' });
       const data = await apiCall({ action: 'getAll' });
       letters = Array.isArray(data) ? data : [];
-    } catch(e) {
-      letters = [];
-    }
+    } catch(e) { letters = []; }
     updateCounts();
     showOverlay(false);
   }
 
-  function showOverlay(show) {
-    document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
-  }
-
+  function showOverlay(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
   function updateCounts() {
     const n = letters.length;
     document.getElementById('count-write').textContent = n;
     document.getElementById('count-list').textContent = n;
+    document.getElementById('count-public').textContent = n;
   }
 
-  /* ── Views ── */
   function showView(v) {
-    ['write','pin','list'].forEach(id => {
-      document.getElementById('view-' + id).style.display = 'none';
-    });
+    ['write','public','pin','list'].forEach(id => { document.getElementById('view-' + id).style.display = 'none'; });
     document.getElementById('home-envelopes').style.display = (v === 'home') ? 'flex' : 'none';
     if (v !== 'home') document.getElementById('view-' + v).style.display = 'block';
     if (v === 'write') setTab('form');
-    if (v === 'pin') {
-      document.getElementById('pin-input').value = '';
-      document.getElementById('pin-error').style.display = 'none';
-    }
+    if (v === 'pin') { document.getElementById('pin-input').value = ''; document.getElementById('pin-error').style.display = 'none'; }
     if (v === 'list') renderList();
+    if (v === 'public') renderPublic();
   }
 
   function checkPin() {
@@ -460,11 +355,9 @@
     const to   = document.getElementById('input-to').value.trim();
     const body = document.getElementById('input-body').value.trim();
     if (!from || !body) { alert('작성자 이름과 소개서 내용을 입력해 주세요!'); return; }
-
     const btn = document.getElementById('btn-save');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> 저장 중...';
-
     try {
       const res = await apiCall({ action: 'add', from, to: to || '(미입력)', body });
       if (res.ok) {
@@ -475,18 +368,12 @@
         document.getElementById('input-body').value = '';
         alert('소개서가 저장됐어요 💌');
         showView('home');
-      } else {
-        alert('저장에 실패했어요. 다시 시도해 주세요.');
-      }
-    } catch(e) {
-      alert('네트워크 오류가 발생했어요.');
-    }
-
+      } else { alert('저장에 실패했어요. 다시 시도해 주세요.'); }
+    } catch(e) { alert('네트워크 오류가 발생했어요.'); }
     btn.disabled = false;
     btn.innerHTML = '💌 소개서 저장하기';
   }
 
-  /* ── List ── */
   async function refreshList() {
     showOverlay(true);
     try {
@@ -498,29 +385,76 @@
     renderList();
   }
 
+  async function refreshPublic() {
+    showOverlay(true);
+    try {
+      const data = await apiCall({ action: 'getAll' });
+      letters = Array.isArray(data) ? data : [];
+      updateCounts();
+    } catch(e) {}
+    showOverlay(false);
+    renderPublic();
+  }
+
   function groupByTo() {
     const map = {};
-    letters.forEach(l => {
-      if (!map[l.to]) map[l.to] = [];
-      map[l.to].push(l);
-    });
+    letters.forEach(l => { if (!map[l.to]) map[l.to] = []; map[l.to].push(l); });
     return map;
   }
 
-  function renderList() {
-    const c = document.getElementById('letters-container');
+  /* ── 공개 보관함 (이름 숨김, 내용만) ── */
+  function renderPublic() {
+    const c = document.getElementById('public-container');
     const groups = groupByTo();
     const keys = Object.keys(groups);
-
     if (!keys.length) {
       c.innerHTML = `<div class="empty-state"><span class="icon">💌</span>아직 작성된 소개서가 없어요.<br>편지봉투를 열어 작성해 주세요.</div>`;
       return;
     }
+    c.innerHTML = keys.map((csm, gi) => {
+      const items = groups[csm];
+      const cardId = 'pub-' + gi;
+      const isOpen = openCards[cardId];
+      const lettersHtml = items.map(l => `
+        <div class="public-letter-item">
+          <div class="public-letter-body">${escHtml(l.body)}</div>
+        </div>`).join('');
+      return `
+        <div class="public-csm-card ${isOpen ? 'open' : ''}" id="${cardId}">
+          <div class="public-csm-header" onclick="togglePublicCard('${cardId}')">
+            <div style="font-size:1.3rem;">💌</div>
+            <div>
+              <div style="font-size:0.88rem; font-weight:500; color:#5c4a5a;">CSM #${gi + 1}</div>
+              <div style="font-size:0.72rem; color:#b0a090;">${items.length}개의 소개서</div>
+            </div>
+            <div class="public-card-arrow">›</div>
+          </div>
+          <div class="public-card-body">${lettersHtml}</div>
+        </div>`;
+    }).join('');
+  }
 
+  function togglePublicCard(id) {
+    openCards[id] = !openCards[id];
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('open', openCards[id]);
+  }
+
+  /* ── 진행자 보관함 (이름 공개/숨김 토글) ── */
+  function renderList() {
+    const c = document.getElementById('letters-container');
+    const groups = groupByTo();
+    const keys = Object.keys(groups);
+    if (!keys.length) {
+      c.innerHTML = `<div class="empty-state"><span class="icon">💌</span>아직 작성된 소개서가 없어요.</div>`;
+      return;
+    }
     c.innerHTML = keys.map((csm, gi) => {
       const items = groups[csm];
       const isRevealed = allRevealed || !!revealed[csm];
       const displayName = isRevealed ? csm : `CSM #${gi + 1}`;
+      const cardId = 'adm-' + gi;
+      const isOpen = openCards[cardId];
 
       const lettersHtml = items.map(l => `
         <div class="letter-item">
@@ -532,22 +466,33 @@
         </div>`).join('');
 
       const toggleBtn = isRevealed
-        ? `<button class="btn-hide" onclick="toggleGroup(${JSON.stringify(csm)}, false)">🙈 다시 숨기기</button>`
-        : `<button class="btn-reveal" onclick="toggleGroup(${JSON.stringify(csm)}, true)">🔓 정답 공개</button>`;
+        ? `<button class="btn-hide" onclick="event.stopPropagation(); toggleGroup('${escHtml(csm)}', false)">🙈 다시 숨기기</button>`
+        : `<button class="btn-reveal" onclick="event.stopPropagation(); toggleGroup('${escHtml(csm)}', true)">🔓 정답 공개</button>`;
 
       return `
-        <div class="csm-group">
-          <div class="csm-group-header">
-            <div>
-              <span class="csm-group-title">${escHtml(displayName)}</span>
-              <span class="csm-group-count">${items.length}개의 소개서</span>
-              ${isRevealed ? '<span class="revealed-badge">공개됨</span>' : ''}
+        <div class="csm-card ${isOpen ? 'open' : ''}" id="${cardId}">
+          <div class="csm-card-header" onclick="toggleAdminCard('${cardId}')">
+            <div class="csm-card-left">
+              <div class="csm-avatar">💌</div>
+              <div>
+                <div class="csm-card-title">${escHtml(displayName)} ${isRevealed ? '<span class="revealed-badge">공개됨</span>' : ''}</div>
+                <div class="csm-card-count">${items.length}개의 소개서</div>
+              </div>
             </div>
-            ${toggleBtn}
+            <div class="csm-card-arrow">›</div>
           </div>
-          ${lettersHtml}
+          <div class="csm-card-body">
+            <div class="csm-card-actions">${toggleBtn}</div>
+            ${lettersHtml}
+          </div>
         </div>`;
     }).join('');
+  }
+
+  function toggleAdminCard(id) {
+    openCards[id] = !openCards[id];
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('open', openCards[id]);
   }
 
   async function deleteLetter(id) {
@@ -557,17 +502,12 @@
       await apiCall({ action: 'delete', id });
       letters = letters.filter(l => l.id.toString() !== id.toString());
       updateCounts();
-    } catch(e) {
-      alert('삭제에 실패했어요.');
-    }
+    } catch(e) { alert('삭제에 실패했어요.'); }
     showOverlay(false);
     renderList();
   }
 
-  function toggleGroup(csm, val) {
-    revealed[csm] = val;
-    renderList();
-  }
+  function toggleGroup(csm, val) { revealed[csm] = val; renderList(); }
 
   function toggleAll() {
     allRevealed = !allRevealed;
@@ -589,9 +529,7 @@
   }
 
   function escHtml(s) {
-    return String(s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   init();

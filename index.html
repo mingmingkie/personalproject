@@ -424,7 +424,7 @@
 </div>
 
 <script>
-  const API = 'https://script.google.com/macros/s/AKfycbwstyWTEhFUObyJ0oa4r8YqgWgkMbC6-aXXcXkvjI2DN_VS54qS86674IurxN1HvpSjdw/exec';
+  const API = 'https://script.google.com/macros/s/AKfycbwgr0nYRYKLyEOIz31Lt3G3TMhnk7tCJKhkUVGZeR3cAmpC1SF5fcHAVBFbHGn0YAhR3g/exec';
   const PIN_KEY = 'hwanseung_pin_v2';
   let letters = [];
   let revealed = {};
@@ -435,8 +435,11 @@
 
   function apiCall(params) {
     return new Promise((resolve, reject) => {
-      const cbName = 'cb_' + Date.now();
+      const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      let settled = false;
       window[cbName] = function(data) {
+        if (settled) return;
+        settled = true;
         resolve(data);
         delete window[cbName];
         const el = document.getElementById(cbName);
@@ -447,7 +450,12 @@
       const script = document.createElement('script');
       script.id = cbName;
       script.src = url;
-      script.onerror = () => { reject(new Error('JSONP error')); delete window[cbName]; };
+      script.onerror = () => {
+        if (settled) return;
+        settled = true;
+        reject(new Error('JSONP error'));
+        delete window[cbName];
+      };
       document.body.appendChild(script);
     });
   }
@@ -513,7 +521,8 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> 저장 중...';
     try {
-      const res = await apiCall({ action: 'add', from, to: to || '(미입력)', body });
+      const clientId = Date.now().toString() + '_' + Math.random().toString(36).slice(2,7);
+      const res = await apiCall({ action: 'add', id: clientId, from, to: to || '(미입력)', body });
       if (res.ok) {
         letters.push({ id: res.id, from, to: to || '(미입력)', body });
         updateCounts();

@@ -248,7 +248,7 @@
       <div id="pin-error" class="error-msg" style="display:none;">PIN이 올바르지 않아요.</div>
       <button class="btn-primary" style="max-width:200px; margin:0 auto; display:block;" onclick="checkPin()">입장하기</button>
     </div>
-    <p style="text-align:center; margin-top:0.75rem; font-size:0.7rem; color:#c0c8d4;">기본 PIN: 1234</p>
+    <p style="text-align:center; margin-top:0.75rem; font-size:0.7rem; color:#c0c8d4;"></p>
     <div style="text-align:center;"><button class="btn-secondary" onclick="showView('home')">← 처음으로</button></div>
   </div>
 
@@ -277,7 +277,7 @@
   let allRevealed = false;
   let openCards = {}; // track open/close state per CSM
 
-  function getPin() { return localStorage.getItem(PIN_KEY) || '1234'; }
+  function getPin() { return localStorage.getItem(PIN_KEY) || '0422'; }
 
   function apiCall(params) {
     return new Promise((resolve, reject) => {

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>환승씨피</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --pink: #f4a7b9;
+    --pink-dark: #e87fa0;
+    --pink-deep: #c2185b;
+    --green: #a8d5b5;
+    --green-dark: #7fbf92;
+    --blue-light: #a8c8e8;
+    --cream: #fffdf5;
+    --warm-border: #e8e0d0;
+    --text-main: #3a4a5a;
+    --text-muted: #8a9bb0;
+    --text-warm: #5c4a3a;
+    --bg-glass: rgba(255,255,255,0.82);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100vh; font-family: 'Noto Sans KR', sans-serif; color: var(--text-main); background: #f5e6ef; overflow-x: hidden; }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, #fce4ec 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 20%, #e3f2fd 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at 50% 80%, #f8bbd0 0%, transparent 60%),
+      linear-gradient(160deg, #fce4ec 0%, #e8f4fd 45%, #f3e5f5 100%);
+    animation: skyShift 12s ease-in-out infinite alternate;
+  }
+  @keyframes skyShift {
+    0%   { filter: hue-rotate(0deg) brightness(1); }
+    100% { filter: hue-rotate(15deg) brightness(1.05); }
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      radial-gradient(circle 80px at 10% 20%, rgba(255,255,255,0.5) 0%, transparent 70%),
+      radial-gradient(circle 120px at 85% 15%, rgba(255,255,255,0.45) 0%, transparent 70%),
+      radial-gradient(circle 60px at 60% 60%, rgba(255,255,255,0.3) 0%, transparent 70%),
+      radial-gradient(circle 90px at 30% 75%, rgba(255,255,255,0.35) 0%, transparent 70%);
+    animation: cloudDrift 20s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes cloudDrift {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(30px); }
+  }
+
+  .app {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 3rem 1rem 4rem;
+  }
+
+  .logo-area { text-align: center; margin-bottom: 3rem; animation: fadeDown 0.7s ease both; }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .logo-title { font-family: 'Nanum Myeongjo', serif; font-size: clamp(2.2rem, 6vw, 3rem); font-weight: 800; color: #4a5a6a; letter-spacing: 0.12em; line-height: 1; }
+  .logo-hearts { display: flex; justify-content: center; gap: 6px; margin: 0.5rem 0 0.4rem; }
+  .logo-hearts span { width: 6px; height: 6px; border-radius: 50%; background: var(--pink-dark); animation: pulse 1.8s ease-in-out infinite; }
+  .logo-hearts span:nth-child(2) { animation-delay: 0.3s; background: var(--green-dark); }
+  .logo-hearts span:nth-child(3) { animation-delay: 0.6s; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.5); opacity: 1; }
+  }
+  .logo-sub { font-size: 0.82rem; color: var(--text-muted); letter-spacing: 0.2em; font-weight: 300; }
+
+  .envelope-row { display: flex; gap: 2.5rem; margin-bottom: 3rem; animation: fadeDown 0.7s 0.15s ease both; }
+  .envelope-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; cursor: pointer; }
+  .envelope-btn {
+    position: relative; width: 100px; height: 72px; border-radius: 8px;
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  .envelope-btn:hover { transform: translateY(-6px) scale(1.05); box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
+  .envelope-btn:active { transform: scale(0.97); }
+  .envelope-btn.green { background: var(--green); border: 2px solid var(--green-dark); }
+  .envelope-btn.pink  { background: var(--pink);  border: 2px solid var(--pink-dark); }
+  .envelope-btn::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 36px;
+    clip-path: polygon(0 0, 100% 0, 50% 58%);
+  }
+  .envelope-btn.green::before { background: var(--green-dark); opacity: 0.6; }
+  .envelope-btn.pink::before  { background: var(--pink-dark);  opacity: 0.6; }
+  .envelope-label { font-size: 0.72rem; font-weight: 500; color: #fff; letter-spacing: 0.06em; position: relative; z-index: 1; margin-top: 18px; }
+  .envelope-count {
+    position: absolute; bottom: -9px; right: -9px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #fff; border: 2px solid rgba(0,0,0,0.1);
+    font-size: 0.72rem; font-weight: 700; color: #5a6a7a;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .envelope-tag { font-size: 0.72rem; color: var(--text-muted); text-align: center; }
+
+  .card {
+    background: var(--bg-glass); border-radius: 20px;
+    border: 1px solid rgba(220,210,230,0.5); padding: 2rem;
+    width: 100%; max-width: 540px;
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 40px rgba(180,150,180,0.1);
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-label { font-size: 0.73rem; color: var(--text-muted); margin-bottom: 0.35rem; letter-spacing: 0.05em; }
+  .input-field {
+    width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid #e0e8f0; border-radius: 10px;
+    font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif; color: var(--text-main);
+    background: rgba(255,255,255,0.9); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 1.1rem;
+  }
+  .input-field:focus { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(244,167,185,0.15); }
+  textarea.input-field { resize: vertical; min-height: 175px; line-height: 1.75; }
+
+  .btn-primary {
+    width: 100%; padding: 0.8rem; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, var(--pink-dark) 0%, var(--blue-light) 100%);
+    color: #fff; font-size: 0.95rem; font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500; cursor: pointer; letter-spacing: 0.04em;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 16px rgba(232,127,160,0.3);
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .btn-secondary {
+    background: rgba(255,255,255,0.7); border: 1.5px solid #dde3ea; border-radius: 10px;
+    padding: 0.55rem 1.1rem; color: var(--text-muted); font-size: 0.82rem;
+    font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s; margin-top: 0.85rem; display: inline-block;
+  }
+  .btn-secondary:hover { background: #f0f4f8; border-color: #c8d0da; }
+
+  .btn-reveal {
+    background: #fff3e0; border: 1.5px solid #ffb74d; border-radius: 9px;
+    padding: 0.4rem 0.9rem; color: #bf360c; font-size: 0.78rem;
+    font-family: 'Noto Sans KR', sans-serif; font-weight: 500; cursor: pointer;
+    transition: background 0.2s; white-space: nowrap;
+  }
+  .btn-reveal:hover { background: #ffe0b2; }
+  .btn-hide {
+    background: #fce4ec; border: 1.5px solid #f48fb1; border-radius: 9px;
+    padding: 0.4rem 0.9rem; color: #880e4f; font-size: 0.78rem;
+    font-family: 'Noto Sans KR', sans-serif; font-weight: 500; cursor: pointer;
+    transition: background 0.2s; white-space: nowrap;
+  }
+  .btn-hide:hover { background: #f8bbd0; }
+
+  .btn-danger {
+    background: none; border: 1.5px solid #ffcdd2; border-radius: 8px;
+    padding: 0.3rem 0.7rem; color: #c62828; font-size: 0.72rem;
+    font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+    transition: background 0.2s; white-space: nowrap;
+  }
+  .btn-danger:hover { background: #ffebee; }
+
+  .tab-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .tab {
+    flex: 1; padding: 0.6rem; border-radius: 10px; border: 1.5px solid #dde3ea;
+    background: rgba(255,255,255,0.6); font-size: 0.82rem;
+    font-family: 'Noto Sans KR', sans-serif; color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, var(--pink-dark), var(--blue-light));
+    color: #fff; border-color: transparent; font-weight: 500;
+    box-shadow: 0 3px 12px rgba(232,127,160,0.25);
+  }
+
+  .notice-box {
+    background: rgba(255,248,240,0.9); border: 1px solid #f0ddc0; border-radius: 10px;
+    padding: 0.8rem 1rem; font-size: 0.8rem; color: #a07040; line-height: 1.7; margin-bottom: 1.1rem;
+  }
+
+  .letter-paper {
+    background: var(--cream); border: 1px solid var(--warm-border); border-radius: 12px;
+    padding: 1.5rem 1.75rem; margin-bottom: 1.1rem;
+    font-family: 'Nanum Myeongjo', serif; font-size: 0.93rem; color: var(--text-warm);
+    line-height: 1.95; white-space: pre-wrap; min-height: 130px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+  .letter-header { font-size: 0.78rem; color: #b0a090; margin-bottom: 0.7rem; font-family: 'Noto Sans KR', sans-serif; }
+  .letter-footer { font-size: 0.78rem; color: #b0a090; margin-top: 0.7rem; text-align: right; font-family: 'Noto Sans KR', sans-serif; }
+
+  .csm-group {
+    background: rgba(255,253,245,0.9); border: 1px solid var(--warm-border); border-radius: 14px;
+    margin-bottom: 1rem; overflow: hidden; box-shadow: 0 2px 12px rgba(200,160,140,0.08);
+    transition: box-shadow 0.2s;
+  }
+  .csm-group:hover { box-shadow: 0 4px 20px rgba(200,160,140,0.14); }
+  .csm-group-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.9rem 1.1rem; background: rgba(255,248,240,0.8);
+    border-bottom: 1px solid #f0e8e0; gap: 0.5rem; flex-wrap: wrap;
+  }
+  .csm-group-title { font-size: 0.9rem; font-weight: 500; color: #5c4a5a; }
+  .csm-group-count { font-size: 0.73rem; color: #b0a090; margin-left: 0.4rem; }
+  .revealed-badge {
+    display: inline-block; font-size: 0.68rem; background: #e8f5e9;
+    border-radius: 20px; padding: 2px 8px; color: #2e7d32; margin-left: 0.4rem;
+  }
+  .letter-item { padding: 1.1rem 1.1rem 0.9rem; border-bottom: 1px solid rgba(240,232,224,0.8); }
+  .letter-item:last-child { border-bottom: none; }
+  .letter-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.55rem; }
+  .cp-badge {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem;
+    background: #eef4fa; border-radius: 20px; padding: 3px 10px; color: #5a7a9a;
+  }
+  .letter-body-text {
+    font-family: 'Nanum Myeongjo', serif; font-size: 0.88rem;
+    color: var(--text-warm); line-height: 1.85; white-space: pre-wrap;
+  }
+
+  .pin-wrap { text-align: center; padding: 0.5rem 0; }
+  .pin-wrap p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.7; }
+  .pin-input {
+    width: 140px; text-align: center; letter-spacing: 0.4em; font-size: 1.3rem;
+    padding: 0.55rem; border: 2px solid #dde3ea; border-radius: 10px;
+    font-family: 'Noto Sans KR', sans-serif; outline: none;
+    margin-bottom: 1rem; display: block; margin-inline: auto;
+    background: rgba(255,255,255,0.9); transition: border-color 0.2s;
+  }
+  .pin-input:focus { border-color: var(--pink); }
+  .error-msg { color: var(--pink-deep); font-size: 0.8rem; margin-bottom: 0.75rem; }
+
+  .divider { border: none; border-top: 1px solid rgba(220,210,220,0.5); margin: 1rem 0; }
+  .card-subtitle { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em; text-align: center; margin-bottom: 1.5rem; font-weight: 300; }
+  .empty-state { text-align: center; color: #b0c0d0; font-size: 0.85rem; padding: 2.5rem 0; line-height: 2; }
+  .empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+  .list-top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.5rem; flex-wrap: wrap; }
+  .bottom-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .bottom-row .btn-secondary { flex: 1; text-align: center; margin-top: 0; }
+
+  /* Loading spinner */
+  .spinner {
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+    border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(252,228,236,0.6); backdrop-filter: blur(4px);
+  }
+  .loading-box {
+    background: rgba(255,255,255,0.9); border-radius: 16px; padding: 2rem 2.5rem;
+    text-align: center; font-size: 0.9rem; color: var(--text-muted);
+    box-shadow: 0 8px 32px rgba(180,150,180,0.15);
+  }
+  .loading-box .spinner { border-color: rgba(232,127,160,0.3); border-top-color: var(--pink-dark); width: 28px; height: 28px; margin: 0 auto 1rem; display: block; }
+
+  @media (max-width: 480px) {
+    .card { padding: 1.5rem; }
+    .envelope-row { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    불러오는 중...
+  </div>
+</div>
+
+<div class="app">
+  <div class="logo-area">
+    <div class="logo-title">환승씨피</div>
+    <div class="logo-hearts"><span></span><span></span><span></span></div>
+    <div class="logo-sub">CP 가 &nbsp; CSM 에 게</div>
+  </div>
+
+  <div class="envelope-row" id="home-envelopes">
+    <div class="envelope-wrapper" onclick="showView('write')">
+      <button class="envelope-btn green" aria-label="소개서 작성하기">
+        <span class="envelope-label">작성하기</span>
+        <div class="envelope-count" id="count-write">0</div>
+      </button>
+      <div class="envelope-tag">X 소개서 쓰기</div>
+    </div>
+    <div class="envelope-wrapper" onclick="showView('pin')">
+      <button class="envelope-btn pink" aria-label="보관함 열기">
+        <span class="envelope-label">보관함</span>
+        <div class="envelope-count" id="count-list">0</div>
+      </button>
+      <div class="envelope-tag">진행자 전용</div>
+    </div>
+  </div>
+
+  <!-- VIEW: Write -->
+  <div class="card" id="view-write" style="display:none;">
+    <div class="tab-row">
+      <button class="tab active" id="tab-form-btn" onclick="setTab('form')">✏️ 편지 작성</button>
+      <button class="tab" id="tab-prev-btn" onclick="setTab('preview')">👀 미리보기</button>
+    </div>
+    <div id="sub-form">
+      <div class="notice-box">💡 CP가 CSM에 대해 쓰는 X 소개서예요. 상대방이 누군지 알 수 있는 특징을 재미있게 적어주세요!</div>
+      <div class="section-label">From — CP 이름 (작성자)</div>
+      <input class="input-field" id="input-from" placeholder="예: 저스틴" />
+      <div class="section-label">To — CSM 이름 (게임 중 숨겨짐)</div>
+      <input class="input-field" id="input-to" placeholder="예: 리아" />
+      <div class="section-label">X 소개서 내용</div>
+      <textarea class="input-field" id="input-body" placeholder="이 사람은 힘들고 지칠 때 대화를 보면 기분이 좋아집니다&#10;항상 작은 일에도 웃어버리는 사람이라는 것..."></textarea>
+      <button class="btn-primary" onclick="goPreview()">미리보기 확인 →</button>
+      <div style="text-align:center;"><button class="btn-secondary" onclick="showView('home')">← 처음으로</button></div>
+    </div>
+    <div id="sub-preview" style="display:none;">
+      <div class="letter-header">To ___에게</div>
+      <div class="letter-paper" id="prev-body"></div>
+      <div class="letter-footer" id="prev-from-label"></div>
+      <hr class="divider" />
+      <button class="btn-primary" id="btn-save" onclick="saveLetter()">💌 소개서 저장하기</button>
+      <div style="text-align:center;"><button class="btn-secondary" onclick="setTab('form')">← 다시 수정하기</button></div>
+    </div>
+  </div>
+
+  <!-- VIEW: PIN -->
+  <div class="card" id="view-pin" style="display:none;">
+    <div class="card-subtitle">진행자 전용 보관함</div>
+    <div class="pin-wrap">
+      <p>진행자만 접근할 수 있어요.<br />PIN 번호를 입력해 주세요.</p>
+      <input class="pin-input" type="password" id="pin-input" maxlength="6" placeholder="••••" onkeydown="if(event.key==='Enter')checkPin()" />
+      <div id="pin-error" class="error-msg" style="display:none;">PIN이 올바르지 않아요.</div>
+      <button class="btn-primary" style="max-width:200px; margin:0 auto; display:block;" onclick="checkPin()">입장하기</button>
+    </div>
+    <p style="text-align:center; margin-top:0.75rem; font-size:0.7rem; color:#c0c8d4;">기본 PIN: 1234</p>
+    <div style="text-align:center;"><button class="btn-secondary" onclick="showView('home')">← 처음으로</button></div>
+  </div>
+
+  <!-- VIEW: List -->
+  <div class="card" id="view-list" style="display:none;">
+    <div class="list-top-bar">
+      <div class="card-subtitle" style="margin:0;">소개서 보관함</div>
+      <button class="btn-reveal" id="btn-all" onclick="toggleAll()">🔓 전체 공개</button>
+    </div>
+    <div class="notice-box">📋 CSM별로 묶어서 표시돼요. <strong>정답 공개</strong> 버튼을 누르면 CSM 이름과 CP 이름이 공개됩니다.</div>
+    <div id="letters-container"></div>
+    <hr class="divider" />
+    <div class="bottom-row">
+      <button class="btn-secondary" onclick="showView('home')">← 처음으로</button>
+      <button class="btn-secondary" onclick="refreshList()">↻ 새로고침</button>
+      <button class="btn-secondary" onclick="changePinFlow()">🔑 PIN 변경</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'https://script.google.com/macros/s/AKfycbzf0rmnCW0bSZTxAVf6hzwZDC9ZSHhQrIfXoONOZrPiB-16OKl8-FUS8HyS8JrSj42M/exec';
+  const PIN_KEY = 'hwanseung_pin_v2';
+
+  let letters = [];
+  let revealed = {};
+  let allRevealed = false;
+
+  function getPin() { return localStorage.getItem(PIN_KEY) || '1234'; }
+
+  /* ── API helper (JSONP — avoids CORS completely) ── */
+  function apiCall(params) {
+    return new Promise((resolve, reject) => {
+      const cbName = 'cb_' + Date.now();
+      window[cbName] = function(data) {
+        resolve(data);
+        delete window[cbName];
+        const el = document.getElementById(cbName);
+        if (el) el.remove();
+      };
+      params.callback = cbName;
+      const url = API + '?' + new URLSearchParams(params);
+      const script = document.createElement('script');
+      script.id = cbName;
+      script.src = url;
+      script.onerror = () => { reject(new Error('JSONP error')); delete window[cbName]; };
+      document.body.appendChild(script);
+    });
+  }
+
+  /* ── Init ── */
+  async function init() {
+    showOverlay(true);
+    try {
+      await apiCall({ action: 'init' });
+      const data = await apiCall({ action: 'getAll' });
+      letters = Array.isArray(data) ? data : [];
+    } catch(e) {
+      letters = [];
+    }
+    updateCounts();
+    showOverlay(false);
+  }
+
+  function showOverlay(show) {
+    document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
+  }
+
+  function updateCounts() {
+    const n = letters.length;
+    document.getElementById('count-write').textContent = n;
+    document.getElementById('count-list').textContent = n;
+  }
+
+  /* ── Views ── */
+  function showView(v) {
+    ['write','pin','list'].forEach(id => {
+      document.getElementById('view-' + id).style.display = 'none';
+    });
+    document.getElementById('home-envelopes').style.display = (v === 'home') ? 'flex' : 'none';
+    if (v !== 'home') document.getElementById('view-' + v).style.display = 'block';
+    if (v === 'write') setTab('form');
+    if (v === 'pin') {
+      document.getElementById('pin-input').value = '';
+      document.getElementById('pin-error').style.display = 'none';
+    }
+    if (v === 'list') renderList();
+  }
+
+  function checkPin() {
+    const val = document.getElementById('pin-input').value;
+    if (val === getPin()) { showView('list'); }
+    else { document.getElementById('pin-error').style.display = 'block'; }
+  }
+
+  function setTab(tab) {
+    const isForm = tab === 'form';
+    document.getElementById('sub-form').style.display    = isForm ? 'block' : 'none';
+    document.getElementById('sub-preview').style.display = isForm ? 'none'  : 'block';
+    document.getElementById('tab-form-btn').classList.toggle('active', isForm);
+    document.getElementById('tab-prev-btn').classList.toggle('active', !isForm);
+  }
+
+  function goPreview() {
+    const from = document.getElementById('input-from').value.trim();
+    const body = document.getElementById('input-body').value.trim();
+    if (!from || !body) { alert('작성자 이름과 소개서 내용을 입력해 주세요!'); return; }
+    document.getElementById('prev-body').textContent = body;
+    document.getElementById('prev-from-label').textContent = 'From ' + from;
+    setTab('preview');
+  }
+
+  async function saveLetter() {
+    const from = document.getElementById('input-from').value.trim();
+    const to   = document.getElementById('input-to').value.trim();
+    const body = document.getElementById('input-body').value.trim();
+    if (!from || !body) { alert('작성자 이름과 소개서 내용을 입력해 주세요!'); return; }
+
+    const btn = document.getElementById('btn-save');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> 저장 중...';
+
+    try {
+      const res = await apiCall({ action: 'add', from, to: to || '(미입력)', body });
+      if (res.ok) {
+        letters.push({ id: res.id, from, to: to || '(미입력)', body });
+        updateCounts();
+        document.getElementById('input-from').value = '';
+        document.getElementById('input-to').value   = '';
+        document.getElementById('input-body').value = '';
+        alert('소개서가 저장됐어요 💌');
+        showView('home');
+      } else {
+        alert('저장에 실패했어요. 다시 시도해 주세요.');
+      }
+    } catch(e) {
+      alert('네트워크 오류가 발생했어요.');
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '💌 소개서 저장하기';
+  }
+
+  /* ── List ── */
+  async function refreshList() {
+    showOverlay(true);
+    try {
+      const data = await apiCall({ action: 'getAll' });
+      letters = Array.isArray(data) ? data : [];
+      updateCounts();
+    } catch(e) {}
+    showOverlay(false);
+    renderList();
+  }
+
+  function groupByTo() {
+    const map = {};
+    letters.forEach(l => {
+      if (!map[l.to]) map[l.to] = [];
+      map[l.to].push(l);
+    });
+    return map;
+  }
+
+  function renderList() {
+    const c = document.getElementById('letters-container');
+    const groups = groupByTo();
+    const keys = Object.keys(groups);
+
+    if (!keys.length) {
+      c.innerHTML = `<div class="empty-state"><span class="icon">💌</span>아직 작성된 소개서가 없어요.<br>편지봉투를 열어 작성해 주세요.</div>`;
+      return;
+    }
+
+    c.innerHTML = keys.map((csm, gi) => {
+      const items = groups[csm];
+      const isRevealed = allRevealed || !!revealed[csm];
+      const displayName = isRevealed ? csm : `CSM #${gi + 1}`;
+
+      const lettersHtml = items.map(l => `
+        <div class="letter-item">
+          <div class="letter-item-top">
+            <div class="cp-badge">${isRevealed ? '✉️ From ' + escHtml(l.from) : '✉️ CP 작성'}</div>
+            <button class="btn-danger" onclick="deleteLetter('${escHtml(l.id)}')">삭제</button>
+          </div>
+          <div class="letter-body-text">${escHtml(l.body)}</div>
+        </div>`).join('');
+
+      const toggleBtn = isRevealed
+        ? `<button class="btn-hide" onclick="toggleGroup(${JSON.stringify(csm)}, false)">🙈 다시 숨기기</button>`
+        : `<button class="btn-reveal" onclick="toggleGroup(${JSON.stringify(csm)}, true)">🔓 정답 공개</button>`;
+
+      return `
+        <div class="csm-group">
+          <div class="csm-group-header">
+            <div>
+              <span class="csm-group-title">${escHtml(displayName)}</span>
+              <span class="csm-group-count">${items.length}개의 소개서</span>
+              ${isRevealed ? '<span class="revealed-badge">공개됨</span>' : ''}
+            </div>
+            ${toggleBtn}
+          </div>
+          ${lettersHtml}
+        </div>`;
+    }).join('');
+  }
+
+  async function deleteLetter(id) {
+    if (!confirm('이 소개서를 삭제할까요?')) return;
+    showOverlay(true);
+    try {
+      await apiCall({ action: 'delete', id });
+      letters = letters.filter(l => l.id.toString() !== id.toString());
+      updateCounts();
+    } catch(e) {
+      alert('삭제에 실패했어요.');
+    }
+    showOverlay(false);
+    renderList();
+  }
+
+  function toggleGroup(csm, val) {
+    revealed[csm] = val;
+    renderList();
+  }
+
+  function toggleAll() {
+    allRevealed = !allRevealed;
+    revealed = {};
+    const btn = document.getElementById('btn-all');
+    btn.textContent = allRevealed ? '🙈 전체 숨기기' : '🔓 전체 공개';
+    btn.className   = allRevealed ? 'btn-hide' : 'btn-reveal';
+    renderList();
+  }
+
+  function changePinFlow() {
+    const cur = prompt('현재 PIN을 입력해 주세요:');
+    if (cur === null) return;
+    if (cur !== getPin()) { alert('현재 PIN이 올바르지 않아요.'); return; }
+    const next = prompt('새 PIN을 입력해 주세요 (4~6자리 숫자):');
+    if (!next || next.length < 4) { alert('PIN은 4자리 이상이어야 해요.'); return; }
+    localStorage.setItem(PIN_KEY, next);
+    alert('PIN이 변경됐어요! 🎉');
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  init();
+</script>
+</body>
+</html>

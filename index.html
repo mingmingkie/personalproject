@@ -319,7 +319,7 @@
       <div class="section-label">To — CSM 이름 (게임 중 숨겨짐)</div>
       <input class="input-field" id="input-to" placeholder="예: 리아" />
       <div class="section-label">X 소개서 내용</div>
-      <textarea class="input-field" id="input-body" placeholder="이 사람은 힘들고 지칠 때 대화를 보면 기분이 좋아집니다&#10;저는 이 사람 덕에 회사 다닐 맛이 나요..."></textarea>
+      <textarea class="input-field" id="input-body" placeholder="이 사람은 힘들고 지칠 때 대화를 보면 기분이 좋아집니다&#10;항상 작은 일에도 웃어버리는 사람이라는 것..."></textarea>
       <button class="btn-primary" onclick="goPreview()">미리보기 확인 →</button>
       <div style="text-align:center;"><button class="btn-secondary" onclick="showView('home')">← 처음으로</button></div>
     </div>
@@ -364,7 +364,7 @@
 </div>
 
 <script>
-  const API = 'https://script.google.com/macros/s/AKfycbyZj6TZm7_g9zXQh5fz-yGxtVbv3O3EsY13UNQUKL62YpZrIIsVwms5MFONbFHBkKbG/exec';
+  const API = 'https://script.google.com/macros/s/AKfycbwstyWTEhFUObyJ0oa4r8YqgWgkMbC6-aXXcXkvjI2DN_VS54qS86674IurxN1HvpSjdw/exec';
   const PIN_KEY = 'hwanseung_pin_v2';
 
   let letters = [];
@@ -373,11 +373,24 @@
 
   function getPin() { return localStorage.getItem(PIN_KEY) || '1234'; }
 
-  /* ── API helper (GET only — avoids CORS) ── */
-  async function apiCall(params) {
-    const url = API + '?' + new URLSearchParams(params);
-    const res = await fetch(url);
-    return res.json();
+  /* ── API helper (JSONP — avoids CORS completely) ── */
+  function apiCall(params) {
+    return new Promise((resolve, reject) => {
+      const cbName = 'cb_' + Date.now();
+      window[cbName] = function(data) {
+        resolve(data);
+        delete window[cbName];
+        const el = document.getElementById(cbName);
+        if (el) el.remove();
+      };
+      params.callback = cbName;
+      const url = API + '?' + new URLSearchParams(params);
+      const script = document.createElement('script');
+      script.id = cbName;
+      script.src = url;
+      script.onerror = () => { reject(new Error('JSONP error')); delete window[cbName]; };
+      document.body.appendChild(script);
+    });
   }
 
   /* ── Init ── */

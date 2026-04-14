@@ -315,11 +315,11 @@
     <div id="sub-form">
       <div class="notice-box">💡 CP가 CSM에 대해 쓰는 X 소개서예요. 상대방이 누군지 알 수 있는 특징을 재미있게 적어주세요!</div>
       <div class="section-label">From — CP 이름 (작성자)</div>
-      <input class="input-field" id="input-from" placeholder="예: 동진" />
+      <input class="input-field" id="input-from" placeholder="예: 저스틴" />
       <div class="section-label">To — CSM 이름 (게임 중 숨겨짐)</div>
-      <input class="input-field" id="input-to" placeholder="예: 다혜" />
+      <input class="input-field" id="input-to" placeholder="예: 리아" />
       <div class="section-label">X 소개서 내용</div>
-      <textarea class="input-field" id="input-body" placeholder="이 사람은 힘들고 지칠 때 대화를 보면 기분이 좋아집니다&#10;항상 작은 일에도 웃어버리는 사람이라는 것..."></textarea>
+      <textarea class="input-field" id="input-body" placeholder="이 사람은 힘들고 지칠 때 대화를 보면 기분이 좋아집니다&#10;저는 이 사람 덕에 회사 다닐 맛이 나요..."></textarea>
       <button class="btn-primary" onclick="goPreview()">미리보기 확인 →</button>
       <div style="text-align:center;"><button class="btn-secondary" onclick="showView('home')">← 처음으로</button></div>
     </div>
@@ -364,7 +364,7 @@
 </div>
 
 <script>
-  const API = 'https://script.google.com/macros/s/AKfycbxL9RAFK4HzhR5o1SLXpO6XyvI2-hciBWRiFH6rSy5ZPIZBxWY_1n9z1_m3LlaBTb0Y/exec';
+  const API = 'https://script.google.com/macros/s/AKfycbyZj6TZm7_g9zXQh5fz-yGxtVbv3O3EsY13UNQUKL62YpZrIIsVwms5MFONbFHBkKbG/exec';
   const PIN_KEY = 'hwanseung_pin_v2';
 
   let letters = [];
@@ -373,18 +373,10 @@
 
   function getPin() { return localStorage.getItem(PIN_KEY) || '1234'; }
 
-  /* ── API helpers ── */
-  async function apiFetch(params) {
+  /* ── API helper (GET only — avoids CORS) ── */
+  async function apiCall(params) {
     const url = API + '?' + new URLSearchParams(params);
     const res = await fetch(url);
-    return res.json();
-  }
-
-  async function apiPost(body) {
-    const res = await fetch(API, {
-      method: 'POST',
-      body: JSON.stringify(body)
-    });
     return res.json();
   }
 
@@ -392,8 +384,8 @@
   async function init() {
     showOverlay(true);
     try {
-      await apiPost({ action: 'init' });
-      const data = await apiFetch({ action: 'getAll' });
+      await apiCall({ action: 'init' });
+      const data = await apiCall({ action: 'getAll' });
       letters = Array.isArray(data) ? data : [];
     } catch(e) {
       letters = [];
@@ -461,7 +453,7 @@
     btn.innerHTML = '<span class="spinner"></span> 저장 중...';
 
     try {
-      const res = await apiPost({ action: 'add', from, to: to || '(미입력)', body });
+      const res = await apiCall({ action: 'add', from, to: to || '(미입력)', body });
       if (res.ok) {
         letters.push({ id: res.id, from, to: to || '(미입력)', body });
         updateCounts();
@@ -485,7 +477,7 @@
   async function refreshList() {
     showOverlay(true);
     try {
-      const data = await apiFetch({ action: 'getAll' });
+      const data = await apiCall({ action: 'getAll' });
       letters = Array.isArray(data) ? data : [];
       updateCounts();
     } catch(e) {}
@@ -549,7 +541,7 @@
     if (!confirm('이 소개서를 삭제할까요?')) return;
     showOverlay(true);
     try {
-      await apiPost({ action: 'delete', id });
+      await apiCall({ action: 'delete', id });
       letters = letters.filter(l => l.id.toString() !== id.toString());
       updateCounts();
     } catch(e) {

@@ -129,17 +129,16 @@
   .cp-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; background: #eef4fa; border-radius: 20px; padding: 3px 10px; color: #5a7a9a; }
   .letter-body-text { font-family: 'Nanum Myeongjo', serif; font-size: 0.88rem; color: var(--text-warm); line-height: 1.85; white-space: pre-wrap; }
 
-  /* Public view - read only letter cards */
-  .public-csm-card { background: rgba(255,253,245,0.92); border: 1px solid var(--warm-border); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(200,160,140,0.08); margin-bottom: 0.75rem; }
-  .public-csm-header { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.1rem; background: rgba(255,248,240,0.6); border-bottom: 1px solid #f0e8e0; cursor: pointer; }
-  .public-csm-header:hover { background: rgba(255,240,220,0.7); }
-  .public-letter-item { padding: 1rem 1.1rem 0.85rem; border-bottom: 1px solid rgba(240,232,224,0.8); }
-  .public-letter-item:last-child { border-bottom: none; }
-  .public-letter-body { font-family: 'Nanum Myeongjo', serif; font-size: 0.9rem; color: var(--text-warm); line-height: 1.9; white-space: pre-wrap; }
-  .public-card-body { display: none; }
-  .public-csm-card.open .public-card-body { display: block; }
-  .public-card-arrow { margin-left: auto; font-size: 1rem; color: #c0b0c0; transition: transform 0.2s; }
-  .public-csm-card.open .public-card-arrow { transform: rotate(90deg); }
+
+
+
+
+
+
+
+
+
+
 
   .pin-wrap { text-align: center; padding: 0.5rem 0; }
   .pin-wrap p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.7; }
@@ -183,19 +182,12 @@
       </button>
       <div class="envelope-tag">X 소개서 쓰기</div>
     </div>
-    <div class="envelope-wrapper" onclick="showView('public')">
-      <button class="envelope-btn blue" aria-label="공개 보관함">
-        <span class="envelope-label">보관함</span>
-        <div class="envelope-count" id="count-public">0</div>
-      </button>
-      <div class="envelope-tag">공개 보관함</div>
-    </div>
     <div class="envelope-wrapper" onclick="showView('pin')">
       <button class="envelope-btn pink" aria-label="진행자 보관함">
-        <span class="envelope-label">진행자</span>
+        <span class="envelope-label">당일 공개</span>
         <div class="envelope-count" id="count-list">0</div>
       </button>
-      <div class="envelope-tag">진행자 전용</div>
+      <div class="envelope-tag">게임 당일날 공개</div>
     </div>
   </div>
 
@@ -225,18 +217,6 @@
       <button class="btn-primary" id="btn-save" onclick="saveLetter()">💌 소개서 저장하기</button>
       <div style="text-align:center;"><button class="btn-secondary" onclick="setTab('form')">← 다시 수정하기</button></div>
     </div>
-  </div>
-
-  <!-- VIEW: Public (공개 보관함) -->
-  <div class="card" id="view-public" style="display:none;">
-    <div class="list-top-bar">
-      <div class="card-subtitle" style="margin:0;">📖 공개 보관함</div>
-      <button class="btn-secondary" style="margin-top:0;" onclick="refreshPublic()">↻ 새로고침</button>
-    </div>
-    <div class="notice-box">💌 CSM을 클릭하면 소개서를 볼 수 있어요. 누가 썼는지는 게임 후 진행자가 공개해요!</div>
-    <div id="public-container"></div>
-    <hr class="divider" />
-    <div style="text-align:center;"><button class="btn-secondary" onclick="showView('home')">← 처음으로</button></div>
   </div>
 
   <!-- VIEW: PIN -->
@@ -314,17 +294,17 @@
     const n = letters.length;
     document.getElementById('count-write').textContent = n;
     document.getElementById('count-list').textContent = n;
-    document.getElementById('count-public').textContent = n;
+
   }
 
   function showView(v) {
-    ['write','public','pin','list'].forEach(id => { document.getElementById('view-' + id).style.display = 'none'; });
+    ['write','pin','list'].forEach(id => { document.getElementById('view-' + id).style.display = 'none'; });
     document.getElementById('home-envelopes').style.display = (v === 'home') ? 'flex' : 'none';
     if (v !== 'home') document.getElementById('view-' + v).style.display = 'block';
     if (v === 'write') setTab('form');
     if (v === 'pin') { document.getElementById('pin-input').value = ''; document.getElementById('pin-error').style.display = 'none'; }
     if (v === 'list') renderList();
-    if (v === 'public') renderPublic();
+
   }
 
   function checkPin() {
@@ -385,59 +365,10 @@
     renderList();
   }
 
-  async function refreshPublic() {
-    showOverlay(true);
-    try {
-      const data = await apiCall({ action: 'getAll' });
-      letters = Array.isArray(data) ? data : [];
-      updateCounts();
-    } catch(e) {}
-    showOverlay(false);
-    renderPublic();
-  }
-
   function groupByTo() {
     const map = {};
     letters.forEach(l => { if (!map[l.to]) map[l.to] = []; map[l.to].push(l); });
     return map;
-  }
-
-  /* ── 공개 보관함 (이름 숨김, 내용만) ── */
-  function renderPublic() {
-    const c = document.getElementById('public-container');
-    const groups = groupByTo();
-    const keys = Object.keys(groups);
-    if (!keys.length) {
-      c.innerHTML = `<div class="empty-state"><span class="icon">💌</span>아직 작성된 소개서가 없어요.<br>편지봉투를 열어 작성해 주세요.</div>`;
-      return;
-    }
-    c.innerHTML = keys.map((csm, gi) => {
-      const items = groups[csm];
-      const cardId = 'pub-' + gi;
-      const isOpen = openCards[cardId];
-      const lettersHtml = items.map(l => `
-        <div class="public-letter-item">
-          <div class="public-letter-body">${escHtml(l.body)}</div>
-        </div>`).join('');
-      return `
-        <div class="public-csm-card ${isOpen ? 'open' : ''}" id="${cardId}">
-          <div class="public-csm-header" onclick="togglePublicCard('${cardId}')">
-            <div style="font-size:1.3rem;">💌</div>
-            <div>
-              <div style="font-size:0.88rem; font-weight:500; color:#5c4a5a;">CSM #${gi + 1}</div>
-              <div style="font-size:0.72rem; color:#b0a090;">${items.length}개의 소개서</div>
-            </div>
-            <div class="public-card-arrow">›</div>
-          </div>
-          <div class="public-card-body">${lettersHtml}</div>
-        </div>`;
-    }).join('');
-  }
-
-  function togglePublicCard(id) {
-    openCards[id] = !openCards[id];
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle('open', openCards[id]);
   }
 
   /* ── 진행자 보관함 (이름 공개/숨김 토글) ── */

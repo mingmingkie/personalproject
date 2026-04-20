@@ -446,17 +446,35 @@
         if (el) el.remove();
       };
       params.callback = cbName;
-      const url = API + '?' + new URLSearchParams(params);
-      const script = document.createElement('script');
-      script.id = cbName;
-      script.src = url;
-      script.onerror = () => {
-        if (settled) return;
-        settled = true;
-        reject(new Error('JSONP error'));
-        delete window[cbName];
-      };
-      document.body.appendChild(script);
+      // body가 긴 경우 fetch POST로 fallback (CORS 우회를 위해 no-cors + JSONP 병행)
+      const urlParams = new URLSearchParams(params);
+      const url = API + '?' + urlParams;
+      // URL이 너무 길면 body를 제외하고 별도 전송
+      if (url.length > 2000 && params.body) {
+        // body를 짧게 잘라서 여러 파라미터로 나누기
+        const bodyChunks = [];
+        const bodyStr = params.body;
+        const chunkSize = 500;
+        for (let i = 0; i < bodyStr.length; i += chunkSize) {
+          bodyChunks.push(bodyStr.slice(i, i + chunkSize));
+        }
+        const safeParams = {...params};
+        delete safeParams.body;
+        bodyChunks.forEach((chunk, i) => { safeParams['body_' + i] = chunk; });
+        safeParams.body_chunks = bodyChunks.length;
+        const safeUrl = API + '?' + new URLSearchParams(safeParams);
+        const script = document.createElement('script');
+        script.id = cbName;
+        script.src = safeUrl;
+        script.onerror = () => { if (settled) return; settled = true; reject(new Error('JSONP error')); delete window[cbName]; };
+        document.body.appendChild(script);
+      } else {
+        const script = document.createElement('script');
+        script.id = cbName;
+        script.src = url;
+        script.onerror = () => { if (settled) return; settled = true; reject(new Error('JSONP error')); delete window[cbName]; };
+        document.body.appendChild(script);
+      }
     });
   }
 

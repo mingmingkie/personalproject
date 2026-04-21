@@ -769,7 +769,7 @@
   }
 
   /* ── 진행자 보관함 (이름 공개/숨김 토글) ── */
-  let adminOrder = []; // 진행자 보관함 순서
+  let adminOrder = JSON.parse(localStorage.getItem('hwanseung_order') || '[]');
   let dragSrcAdmin = null;
 
   function renderList() {
@@ -781,11 +781,13 @@
       return;
     }
     // 처음 로드 시 순서 초기화, 이후엔 adminOrder 유지
-    if (adminOrder.length === 0 || !adminOrder.every(k => keys.includes(k))) {
+    if (adminOrder.length === 0 || !adminOrder.some(k => keys.includes(k))) {
       adminOrder = [...keys];
+      localStorage.setItem('hwanseung_order', JSON.stringify(adminOrder));
     }
     // 새로 추가된 키는 뒤에 붙이기
     keys.forEach(k => { if (!adminOrder.includes(k)) adminOrder.push(k); });
+    localStorage.setItem('hwanseung_order', JSON.stringify(adminOrder));
 
     c.innerHTML = adminOrder.filter(csm => groups[csm]).map((csm, gi) => {
       const items = groups[csm];
@@ -855,6 +857,7 @@
     if (srcIdx < 0 || tgtIdx < 0) return;
     adminOrder.splice(srcIdx, 1);
     adminOrder.splice(tgtIdx, 0, dragSrcAdmin);
+    localStorage.setItem('hwanseung_order', JSON.stringify(adminOrder));
     renderList();
   }
 

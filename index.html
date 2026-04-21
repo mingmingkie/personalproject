@@ -168,24 +168,73 @@
   function showPresSelect() {
     const groups = groupByTo();
     const keys = Object.keys(groups);
-    selectedCSMs = new Set(keys); // 기본 전체 선택
+    selectedCSMs = new Set(keys);
     renderSelectGrid(groups, keys);
     document.getElementById('pres-select-overlay').classList.add('active');
   }
 
+  let dragSrcCSM = null;
+  let csmOrder = []; // 현재 순서
+
   function renderSelectGrid(groups, keys) {
+    csmOrder = [...keys];
+    _renderGrid(groups);
+  }
+
+  function _renderGrid(groups) {
     const grid = document.getElementById('pres-select-grid');
-    grid.innerHTML = keys.map((csm, i) => {
+    grid.innerHTML = csmOrder.map((csm, i) => {
       const isRev = allRevealed || !!revealed[csm];
       const label = isRev ? csm : 'CSM #' + (i + 1);
-      const count = groups[csm].length;
+      const count = (groups[csm] || []).length;
       const checked = selectedCSMs.has(csm);
+      const safeCSM = csm.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       return `
-        <label class="pres-select-item ${checked ? 'selected' : ''}" onclick="toggleSelectCSM('${csm.replace(/'/g,"\'")}', this)">
-          <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSelectCSM('${csm.replace(/'/g,"\'")}', this.closest('label'))" />
-          <span>${label} <span style="color:#b0a090;">(${count}개)</span></span>
-        </label>`;
+        <div class="pres-select-item ${checked ? 'selected' : ''}"
+          draggable="true"
+          data-csm="${csm.replace(/"/g,'&quot;')}"
+          ondragstart="onDragStart(event)"
+          ondragover="onDragOver(event)"
+          ondrop="onDrop(event, '${safeCSM}', this, groups)"
+          ondragend="onDragEnd(event)">
+          <span class="drag-handle">⠿</span>
+          <input type="checkbox" ${checked ? 'checked' : ''} onclick="event.stopPropagation(); toggleSelectCSM('${safeCSM}', this.closest('.pres-select-item'))" />
+          <span onclick="toggleSelectCSM('${safeCSM}', this.closest('.pres-select-item'))">${label} <span style="color:#b0a090;">(${count}개)</span></span>
+        </div>`;
     }).join('');
+    // groups를 grid에 저장
+    grid._groups = groups;
+  }
+
+  function onDragStart(e) {
+    dragSrcCSM = e.currentTarget.dataset.csm;
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.pres-select-item').forEach(el => el.classList.remove('drag-over'));
+    e.currentTarget.classList.add('drag-over');
+  }
+
+  function onDrop(e, targetCSM, el, groups) {
+    e.preventDefault();
+    if (!dragSrcCSM || dragSrcCSM === targetCSM) return;
+    const srcIdx = csmOrder.indexOf(dragSrcCSM);
+    const tgtIdx = csmOrder.indexOf(targetCSM);
+    if (srcIdx < 0 || tgtIdx < 0) return;
+    csmOrder.splice(srcIdx, 1);
+    csmOrder.splice(tgtIdx, 0, dragSrcCSM);
+    _renderGrid(document.getElementById('pres-select-grid')._groups);
+  }
+
+  function onDragEnd(e) {
+    document.querySelectorAll('.pres-select-item').forEach(el => {
+      el.classList.remove('dragging', 'drag-over');
+    });
+    dragSrcCSM = null;
   }
 
   function toggleSelectCSM(csm, el) {
@@ -201,15 +250,15 @@
   }
 
   function selectAll() {
-    const groups = groupByTo();
-    Object.keys(groups).forEach(csm => selectedCSMs.add(csm));
-    renderSelectGrid(groups, Object.keys(groups));
+    const groups = document.getElementById('pres-select-grid')._groups || groupByTo();
+    csmOrder.forEach(csm => selectedCSMs.add(csm));
+    _renderGrid(groups);
   }
 
   function selectNone() {
     selectedCSMs.clear();
-    const groups = groupByTo();
-    renderSelectGrid(groups, Object.keys(groups));
+    const groups = document.getElementById('pres-select-grid')._groups || groupByTo();
+    _renderGrid(groups);
   }
 
   function closePresSelect() {
@@ -218,10 +267,10 @@
 
   function startPresentationSelected() {
     if (selectedCSMs.size === 0) { alert('최소 1개 이상 선택해주세요!'); return; }
-    const groups = groupByTo();
-    presGroups = Object.keys(groups)
+    const groups = document.getElementById('pres-select-grid')._groups || groupByTo();
+    presGroups = csmOrder
       .filter(csm => selectedCSMs.has(csm))
-      .map((csm, i) => ({ csm, items: groups[csm], idx: i }));
+      .map((csm, i) => ({ csm, items: groups[csm] || [], idx: i }));
     presRevealedMap = {};
     renderPresCards();
     document.getElementById('pres-select-overlay').classList.remove('active');
@@ -401,6 +450,14 @@
   .pres-select-toolbar button { font-size: 0.75rem; padding: 0.3rem 0.75rem; border-radius: 8px; border: 1px solid #ddd; background: none; cursor: pointer; color: #8a9bb0; }
   .pres-select-toolbar button:hover { background: #f0f4f8; }
 
+
+  .pres-select-item { user-select: none; }
+  .pres-select-item.dragging { opacity: 0.4; border: 2px dashed var(--pink-dark); }
+  .pres-select-item.drag-over { border: 2px solid var(--pink-dark); background: #fff0f4; transform: scale(1.02); }
+  .drag-handle { color: #c0b0c0; font-size: 0.9rem; cursor: grab; margin-right: 2px; flex-shrink: 0; }
+  .drag-handle:active { cursor: grabbing; }
+  .pres-select-sub { font-size: 0.78rem; color: #b0a090; margin-bottom: 1.25rem; }
+
 </style>
 </head>
 <body>
@@ -497,7 +554,7 @@
   <div id="pres-select-overlay">
     <div class="pres-select-box">
       <div class="pres-select-title">🎬 발표할 CSM 선택</div>
-      <div class="pres-select-sub">발표에 포함할 CSM을 선택하세요. 선택한 순서대로 표시돼요.</div>
+      <div class="pres-select-sub">체크로 선택, <strong>⠿ 드래그</strong>로 순서를 바꿀 수 있어요.</div>
       <div class="pres-select-toolbar">
         <button onclick="selectAll()">전체 선택</button>
         <button onclick="selectNone()">전체 해제</button>
@@ -807,24 +864,73 @@
   function showPresSelect() {
     const groups = groupByTo();
     const keys = Object.keys(groups);
-    selectedCSMs = new Set(keys); // 기본 전체 선택
+    selectedCSMs = new Set(keys);
     renderSelectGrid(groups, keys);
     document.getElementById('pres-select-overlay').classList.add('active');
   }
 
+  let dragSrcCSM = null;
+  let csmOrder = []; // 현재 순서
+
   function renderSelectGrid(groups, keys) {
+    csmOrder = [...keys];
+    _renderGrid(groups);
+  }
+
+  function _renderGrid(groups) {
     const grid = document.getElementById('pres-select-grid');
-    grid.innerHTML = keys.map((csm, i) => {
+    grid.innerHTML = csmOrder.map((csm, i) => {
       const isRev = allRevealed || !!revealed[csm];
       const label = isRev ? csm : 'CSM #' + (i + 1);
-      const count = groups[csm].length;
+      const count = (groups[csm] || []).length;
       const checked = selectedCSMs.has(csm);
+      const safeCSM = csm.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       return `
-        <label class="pres-select-item ${checked ? 'selected' : ''}" onclick="toggleSelectCSM('${csm.replace(/'/g,"\'")}', this)">
-          <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSelectCSM('${csm.replace(/'/g,"\'")}', this.closest('label'))" />
-          <span>${label} <span style="color:#b0a090;">(${count}개)</span></span>
-        </label>`;
+        <div class="pres-select-item ${checked ? 'selected' : ''}"
+          draggable="true"
+          data-csm="${csm.replace(/"/g,'&quot;')}"
+          ondragstart="onDragStart(event)"
+          ondragover="onDragOver(event)"
+          ondrop="onDrop(event, '${safeCSM}', this, groups)"
+          ondragend="onDragEnd(event)">
+          <span class="drag-handle">⠿</span>
+          <input type="checkbox" ${checked ? 'checked' : ''} onclick="event.stopPropagation(); toggleSelectCSM('${safeCSM}', this.closest('.pres-select-item'))" />
+          <span onclick="toggleSelectCSM('${safeCSM}', this.closest('.pres-select-item'))">${label} <span style="color:#b0a090;">(${count}개)</span></span>
+        </div>`;
     }).join('');
+    // groups를 grid에 저장
+    grid._groups = groups;
+  }
+
+  function onDragStart(e) {
+    dragSrcCSM = e.currentTarget.dataset.csm;
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.pres-select-item').forEach(el => el.classList.remove('drag-over'));
+    e.currentTarget.classList.add('drag-over');
+  }
+
+  function onDrop(e, targetCSM, el, groups) {
+    e.preventDefault();
+    if (!dragSrcCSM || dragSrcCSM === targetCSM) return;
+    const srcIdx = csmOrder.indexOf(dragSrcCSM);
+    const tgtIdx = csmOrder.indexOf(targetCSM);
+    if (srcIdx < 0 || tgtIdx < 0) return;
+    csmOrder.splice(srcIdx, 1);
+    csmOrder.splice(tgtIdx, 0, dragSrcCSM);
+    _renderGrid(document.getElementById('pres-select-grid')._groups);
+  }
+
+  function onDragEnd(e) {
+    document.querySelectorAll('.pres-select-item').forEach(el => {
+      el.classList.remove('dragging', 'drag-over');
+    });
+    dragSrcCSM = null;
   }
 
   function toggleSelectCSM(csm, el) {
@@ -840,15 +946,15 @@
   }
 
   function selectAll() {
-    const groups = groupByTo();
-    Object.keys(groups).forEach(csm => selectedCSMs.add(csm));
-    renderSelectGrid(groups, Object.keys(groups));
+    const groups = document.getElementById('pres-select-grid')._groups || groupByTo();
+    csmOrder.forEach(csm => selectedCSMs.add(csm));
+    _renderGrid(groups);
   }
 
   function selectNone() {
     selectedCSMs.clear();
-    const groups = groupByTo();
-    renderSelectGrid(groups, Object.keys(groups));
+    const groups = document.getElementById('pres-select-grid')._groups || groupByTo();
+    _renderGrid(groups);
   }
 
   function closePresSelect() {
@@ -857,10 +963,10 @@
 
   function startPresentationSelected() {
     if (selectedCSMs.size === 0) { alert('최소 1개 이상 선택해주세요!'); return; }
-    const groups = groupByTo();
-    presGroups = Object.keys(groups)
+    const groups = document.getElementById('pres-select-grid')._groups || groupByTo();
+    presGroups = csmOrder
       .filter(csm => selectedCSMs.has(csm))
-      .map((csm, i) => ({ csm, items: groups[csm], idx: i }));
+      .map((csm, i) => ({ csm, items: groups[csm] || [], idx: i }));
     presRevealedMap = {};
     renderPresCards();
     document.getElementById('pres-select-overlay').classList.remove('active');

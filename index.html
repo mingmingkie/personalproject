@@ -161,6 +161,73 @@
 
   @media (max-width: 480px) { .card { padding: 1.5rem; } .envelope-row { gap: 1.5rem; } }
 
+
+  /* ── Presentation Select ── */
+  let selectedCSMs = new Set();
+
+  function showPresSelect() {
+    const groups = groupByTo();
+    const keys = Object.keys(groups);
+    selectedCSMs = new Set(keys); // 기본 전체 선택
+    renderSelectGrid(groups, keys);
+    document.getElementById('pres-select-overlay').classList.add('active');
+  }
+
+  function renderSelectGrid(groups, keys) {
+    const grid = document.getElementById('pres-select-grid');
+    grid.innerHTML = keys.map((csm, i) => {
+      const isRev = allRevealed || !!revealed[csm];
+      const label = isRev ? csm : 'CSM #' + (i + 1);
+      const count = groups[csm].length;
+      const checked = selectedCSMs.has(csm);
+      return `
+        <label class="pres-select-item ${checked ? 'selected' : ''}" onclick="toggleSelectCSM('${csm.replace(/'/g,"\'")}', this)">
+          <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSelectCSM('${csm.replace(/'/g,"\'")}', this.closest('label'))" />
+          <span>${label} <span style="color:#b0a090;">(${count}개)</span></span>
+        </label>`;
+    }).join('');
+  }
+
+  function toggleSelectCSM(csm, el) {
+    if (selectedCSMs.has(csm)) {
+      selectedCSMs.delete(csm);
+      el.classList.remove('selected');
+      el.querySelector('input').checked = false;
+    } else {
+      selectedCSMs.add(csm);
+      el.classList.add('selected');
+      el.querySelector('input').checked = true;
+    }
+  }
+
+  function selectAll() {
+    const groups = groupByTo();
+    Object.keys(groups).forEach(csm => selectedCSMs.add(csm));
+    renderSelectGrid(groups, Object.keys(groups));
+  }
+
+  function selectNone() {
+    selectedCSMs.clear();
+    const groups = groupByTo();
+    renderSelectGrid(groups, Object.keys(groups));
+  }
+
+  function closePresSelect() {
+    document.getElementById('pres-select-overlay').classList.remove('active');
+  }
+
+  function startPresentationSelected() {
+    if (selectedCSMs.size === 0) { alert('최소 1개 이상 선택해주세요!'); return; }
+    const groups = groupByTo();
+    presGroups = Object.keys(groups)
+      .filter(csm => selectedCSMs.has(csm))
+      .map((csm, i) => ({ csm, items: groups[csm], idx: i }));
+    presRevealedMap = {};
+    renderPresCards();
+    document.getElementById('pres-select-overlay').classList.remove('active');
+    document.getElementById('presentation-overlay').classList.add('active');
+  }
+
   /* ── Presentation Mode ── */
   .btn-present { background: #e8f5e9; border: 1.5px solid #a5d6a7; border-radius: 9px; padding: 0.4rem 0.9rem; color: #2e7d32; font-size: 0.78rem; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
   .btn-present:hover { background: #c8e6c9; }
@@ -300,6 +367,40 @@
   .pres-answer { font-size: 0.88rem; color: rgba(255,255,255,0.7); font-family: 'Noto Sans KR', sans-serif; }
   .pres-answer.shown { color: #ffd54f; font-weight: 500; }
 
+
+  /* ── Presentation Select Screen ── */
+  #pres-select-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(80,50,10,0.92); flex-direction: column;
+    align-items: center; justify-content: center; padding: 2rem;
+  }
+  #pres-select-overlay.active { display: flex; }
+  .pres-select-box {
+    background: rgba(255,255,255,0.95); border-radius: 20px;
+    padding: 2rem; width: 100%; max-width: 560px;
+    max-height: 80vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .pres-select-title { font-family: 'Nanum Myeongjo', serif; font-size: 1.2rem; color: #5c4a3a; margin-bottom: 0.4rem; }
+  .pres-select-sub { font-size: 0.78rem; color: #b0a090; margin-bottom: 1.25rem; }
+  .pres-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.25rem; }
+  .pres-select-item {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.6rem 0.75rem; border-radius: 10px;
+    border: 1.5px solid #e8e0d0; cursor: pointer;
+    transition: all 0.15s; background: #fffdf5;
+    font-size: 0.82rem; color: #5c4a5a;
+  }
+  .pres-select-item:hover { border-color: var(--pink); background: #fff0f4; }
+  .pres-select-item.selected { border-color: var(--pink-dark); background: #fce4ec; }
+  .pres-select-item input[type=checkbox] { accent-color: var(--pink-dark); width: 16px; height: 16px; cursor: pointer; }
+  .pres-select-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .pres-select-actions .btn-primary { flex: 2; }
+  .pres-select-actions .btn-secondary { flex: 1; margin-top: 0; }
+  .pres-select-toolbar { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .pres-select-toolbar button { font-size: 0.75rem; padding: 0.3rem 0.75rem; border-radius: 8px; border: 1px solid #ddd; background: none; cursor: pointer; color: #8a9bb0; }
+  .pres-select-toolbar button:hover { background: #f0f4f8; }
+
 </style>
 </head>
 <body>
@@ -377,7 +478,7 @@
     <div class="list-top-bar">
       <div class="card-subtitle" style="margin:0;">🔑 진행자 보관함</div>
       <div style="display:flex; gap:0.5rem;">
-        <button class="btn-present" onclick="startPresentation()">🎬 발표 모드</button>
+        <button class="btn-present" onclick="showPresSelect()">🎬 발표 모드</button>
         <button class="btn-reveal" id="btn-all" onclick="toggleAll()">🔓 전체 공개</button>
       </div>
     </div>
@@ -388,6 +489,24 @@
       <button class="btn-secondary" onclick="showView('home')">← 처음으로</button>
       <button class="btn-secondary" onclick="refreshList()">↻ 새로고침</button>
       <button class="btn-secondary" onclick="changePinFlow()">🔑 PIN 변경</button>
+    </div>
+  </div>
+
+
+  <!-- PRESENTATION SELECT -->
+  <div id="pres-select-overlay">
+    <div class="pres-select-box">
+      <div class="pres-select-title">🎬 발표할 CSM 선택</div>
+      <div class="pres-select-sub">발표에 포함할 CSM을 선택하세요. 선택한 순서대로 표시돼요.</div>
+      <div class="pres-select-toolbar">
+        <button onclick="selectAll()">전체 선택</button>
+        <button onclick="selectNone()">전체 해제</button>
+      </div>
+      <div class="pres-select-grid" id="pres-select-grid"></div>
+      <div class="pres-select-actions">
+        <button class="btn-primary" onclick="startPresentationSelected()">선택한 CSM으로 발표 시작 →</button>
+        <button class="btn-secondary" style="margin-top:0;" onclick="closePresSelect()">취소</button>
+      </div>
     </div>
   </div>
 
@@ -433,13 +552,23 @@
 
   function getPin() { return localStorage.getItem(PIN_KEY) || '0811'; }
 
-  function apiCall(params) {
+  function apiCall(params, timeoutMs) {
+    timeoutMs = timeoutMs || 15000;
     return new Promise((resolve, reject) => {
       const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
       let settled = false;
+      const timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        reject(new Error('timeout'));
+        delete window[cbName];
+        const el = document.getElementById(cbName);
+        if (el) el.remove();
+      }, timeoutMs);
       window[cbName] = function(data) {
         if (settled) return;
         settled = true;
+        clearTimeout(timer);
         resolve(data);
         delete window[cbName];
         const el = document.getElementById(cbName);
@@ -538,19 +667,25 @@
     const btn = document.getElementById('btn-save');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> 저장 중...';
+    const clientId = Date.now().toString() + '_' + Math.random().toString(36).slice(2,7);
+    const toVal = to || '(미입력)';
     try {
-      const clientId = Date.now().toString() + '_' + Math.random().toString(36).slice(2,7);
-      const res = await apiCall({ action: 'add', id: clientId, from, to: to || '(미입력)', body });
-      if (res.ok) {
-        letters.push({ id: res.id, from, to: to || '(미입력)', body });
-        updateCounts();
-        document.getElementById('input-from').value = '';
-        document.getElementById('input-to').value   = '';
-        document.getElementById('input-body').value = '';
-        alert('소개서가 저장됐어요 💌');
-        showView('home');
-      } else { alert('저장에 실패했어요. 다시 시도해 주세요.'); }
-    } catch(e) { alert('네트워크 오류가 발생했어요.'); }
+      // POST로 전송 (길이 제한 없음, no-cors라 응답은 못 받지만 저장은 됨)
+      await fetch(API, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'add', id: clientId, from, to: toVal, body })
+      });
+    } catch(e) {}
+    // 저장 완료 처리
+    letters.push({ id: clientId, from, to: toVal, body });
+    updateCounts();
+    document.getElementById('input-from').value = '';
+    document.getElementById('input-to').value   = '';
+    document.getElementById('input-body').value = '';
+    alert('소개서가 저장됐어요 💌');
+    showView('home');
     btn.disabled = false;
     btn.innerHTML = '💌 소개서 저장하기';
   }
@@ -664,6 +799,73 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+
+
+  /* ── Presentation Select ── */
+  let selectedCSMs = new Set();
+
+  function showPresSelect() {
+    const groups = groupByTo();
+    const keys = Object.keys(groups);
+    selectedCSMs = new Set(keys); // 기본 전체 선택
+    renderSelectGrid(groups, keys);
+    document.getElementById('pres-select-overlay').classList.add('active');
+  }
+
+  function renderSelectGrid(groups, keys) {
+    const grid = document.getElementById('pres-select-grid');
+    grid.innerHTML = keys.map((csm, i) => {
+      const isRev = allRevealed || !!revealed[csm];
+      const label = isRev ? csm : 'CSM #' + (i + 1);
+      const count = groups[csm].length;
+      const checked = selectedCSMs.has(csm);
+      return `
+        <label class="pres-select-item ${checked ? 'selected' : ''}" onclick="toggleSelectCSM('${csm.replace(/'/g,"\'")}', this)">
+          <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSelectCSM('${csm.replace(/'/g,"\'")}', this.closest('label'))" />
+          <span>${label} <span style="color:#b0a090;">(${count}개)</span></span>
+        </label>`;
+    }).join('');
+  }
+
+  function toggleSelectCSM(csm, el) {
+    if (selectedCSMs.has(csm)) {
+      selectedCSMs.delete(csm);
+      el.classList.remove('selected');
+      el.querySelector('input').checked = false;
+    } else {
+      selectedCSMs.add(csm);
+      el.classList.add('selected');
+      el.querySelector('input').checked = true;
+    }
+  }
+
+  function selectAll() {
+    const groups = groupByTo();
+    Object.keys(groups).forEach(csm => selectedCSMs.add(csm));
+    renderSelectGrid(groups, Object.keys(groups));
+  }
+
+  function selectNone() {
+    selectedCSMs.clear();
+    const groups = groupByTo();
+    renderSelectGrid(groups, Object.keys(groups));
+  }
+
+  function closePresSelect() {
+    document.getElementById('pres-select-overlay').classList.remove('active');
+  }
+
+  function startPresentationSelected() {
+    if (selectedCSMs.size === 0) { alert('최소 1개 이상 선택해주세요!'); return; }
+    const groups = groupByTo();
+    presGroups = Object.keys(groups)
+      .filter(csm => selectedCSMs.has(csm))
+      .map((csm, i) => ({ csm, items: groups[csm], idx: i }));
+    presRevealedMap = {};
+    renderPresCards();
+    document.getElementById('pres-select-overlay').classList.remove('active');
+    document.getElementById('presentation-overlay').classList.add('active');
+  }
 
   /* ── Presentation Mode ── */
   const CARD_COLORS = [

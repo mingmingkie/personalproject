@@ -167,9 +167,13 @@
 
   function showPresSelect() {
     const groups = groupByTo();
-    const keys = Object.keys(groups);
-    selectedCSMs = new Set(keys);
-    renderSelectGrid(groups, keys);
+    // adminOrder가 있으면 그 순서로, 없으면 기본 순서
+    const allKeys = Object.keys(groups);
+    const orderedKeys = adminOrder.length > 0
+      ? [...adminOrder.filter(k => groups[k]), ...allKeys.filter(k => !adminOrder.includes(k))]
+      : allKeys;
+    selectedCSMs = new Set(orderedKeys);
+    renderSelectGrid(groups, orderedKeys);
     document.getElementById('pres-select-overlay').classList.add('active');
   }
 
@@ -765,6 +769,9 @@
   }
 
   /* ── 진행자 보관함 (이름 공개/숨김 토글) ── */
+  let adminOrder = []; // 진행자 보관함 순서
+  let dragSrcAdmin = null;
+
   function renderList() {
     const c = document.getElementById('letters-container');
     const groups = groupByTo();
@@ -773,7 +780,14 @@
       c.innerHTML = `<div class="empty-state"><span class="icon">💌</span>아직 작성된 소개서가 없어요.</div>`;
       return;
     }
-    c.innerHTML = keys.map((csm, gi) => {
+    // 처음 로드 시 순서 초기화, 이후엔 adminOrder 유지
+    if (adminOrder.length === 0 || !adminOrder.every(k => keys.includes(k))) {
+      adminOrder = [...keys];
+    }
+    // 새로 추가된 키는 뒤에 붙이기
+    keys.forEach(k => { if (!adminOrder.includes(k)) adminOrder.push(k); });
+
+    c.innerHTML = adminOrder.filter(csm => groups[csm]).map((csm, gi) => {
       const items = groups[csm];
       const isRevealed = allRevealed || !!revealed[csm];
       const displayName = isRevealed ? csm : `CSM #${gi + 1}`;
@@ -794,10 +808,16 @@
         : `<button class="btn-reveal" onclick="event.stopPropagation(); toggleGroup('${escHtml(csm)}', true)">🔓 정답 공개</button>`;
 
       return `
-        <div class="csm-card ${isOpen ? 'open' : ''}" id="${cardId}">
+        <div class="csm-card ${isOpen ? 'open' : ''}" id="${cardId}"
+          draggable="true"
+          data-csm="${csm.replace(/"/g,'&quot;')}"
+          ondragstart="onAdminDragStart(event)"
+          ondragover="onAdminDragOver(event)"
+          ondrop="onAdminDrop(event)"
+          ondragend="onAdminDragEnd(event)">
           <div class="csm-card-header" onclick="toggleAdminCard('${cardId}')">
             <div class="csm-card-left">
-              <div class="csm-avatar">💌</div>
+              <div class="csm-avatar" style="cursor:grab; font-size:0.9rem;" title="드래그해서 순서 변경">⠿</div>
               <div>
                 <div class="csm-card-title">${escHtml(displayName)} ${isRevealed ? '<span class="revealed-badge">공개됨</span>' : ''}</div>
                 <div class="csm-card-count">${items.length}개의 소개서</div>
@@ -811,6 +831,39 @@
           </div>
         </div>`;
     }).join('');
+  }
+
+  function onAdminDragStart(e) {
+    dragSrcAdmin = e.currentTarget.dataset.csm;
+    e.currentTarget.style.opacity = '0.4';
+    e.dataTransfer.effectAllowed = 'move';
+  }
+
+  function onAdminDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.csm-card').forEach(el => el.style.borderColor = '');
+    e.currentTarget.style.borderColor = '#e87fa0';
+  }
+
+  function onAdminDrop(e) {
+    e.preventDefault();
+    const targetCSM = e.currentTarget.dataset.csm;
+    if (!dragSrcAdmin || dragSrcAdmin === targetCSM) return;
+    const srcIdx = adminOrder.indexOf(dragSrcAdmin);
+    const tgtIdx = adminOrder.indexOf(targetCSM);
+    if (srcIdx < 0 || tgtIdx < 0) return;
+    adminOrder.splice(srcIdx, 1);
+    adminOrder.splice(tgtIdx, 0, dragSrcAdmin);
+    renderList();
+  }
+
+  function onAdminDragEnd(e) {
+    document.querySelectorAll('.csm-card').forEach(el => {
+      el.style.opacity = '';
+      el.style.borderColor = '';
+    });
+    dragSrcAdmin = null;
   }
 
   function toggleAdminCard(id) {
@@ -863,9 +916,13 @@
 
   function showPresSelect() {
     const groups = groupByTo();
-    const keys = Object.keys(groups);
-    selectedCSMs = new Set(keys);
-    renderSelectGrid(groups, keys);
+    // adminOrder가 있으면 그 순서로, 없으면 기본 순서
+    const allKeys = Object.keys(groups);
+    const orderedKeys = adminOrder.length > 0
+      ? [...adminOrder.filter(k => groups[k]), ...allKeys.filter(k => !adminOrder.includes(k))]
+      : allKeys;
+    selectedCSMs = new Set(orderedKeys);
+    renderSelectGrid(groups, orderedKeys);
     document.getElementById('pres-select-overlay').classList.add('active');
   }
 
